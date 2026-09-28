@@ -1,4 +1,4 @@
-# bigmove_deploy — frozen bundle (28 Sept 2026; + tradability_audit v1; + stage A in `open_close\`)
+# bigmove_deploy — frozen bundle (28 Sept 2026; + tradability_audit v1; + stages A and B in `open_close\`)
 
 All files go FLAT into `C:\Users\karanvsi\PyCharmMiscProject\bigmove_deploy` (they import each other by name). `tests\` stays a subfolder.
 
@@ -77,6 +77,8 @@ Separate on purpose: the 23:45 daily pipeline keeps using the main folder's v31 
 | research_common.py | - | main-folder version + ETF rule `etf-v1` + price-band lock proxy |
 | EXPERIMENT_OC_FAMILY.json | oc_v1 | the pre-declared target family (4 horizons), stage-B screen rules, stage-D gate; never edited after stage B starts |
 | tests\test_panel_oc.py | - | planted-effect tests incl. module-origin (no shadowing), golden checksums of the old labels, 5 sabotaged panels |
+| stage_b_screen.py | v1.1 | stage B: target distributions first (N, mean, median, SD, p1-p99, positive share by fold, buy-everything net); then every clean feature x the 4 open-to-close targets (marginal evidence); per-day rank IC, Newey-West t, BH q, fold stability (declared rule q <= 0.10 AND 4/5 folds), descriptive quintile economics (`quintile_*` columns - not a trading result), descriptive families; research rows only (pinned lockbox 2025-03-05), eligible rows only; refuses an unaudited panel or a changed manifest; one run per panel unless `--rerun-reason`. Output `panel_oc\stage_b\STAGEB_*` |
+| tests\test_stage_b.py | - | statistics vs independent code; planted world (signal, noise, unstable, unbuyable-only, post-lockbox-only, pre-fold-only, leak, market-level, price levels); power checks; preconditions |
 
 ## Optional user file
 - `%CACHE_DAILY_ROOT%\universe_exclude.txt` - one symbol per line: extra funds/non-equities for panel_build to exclude (the ETF rule catches the systematic names).
