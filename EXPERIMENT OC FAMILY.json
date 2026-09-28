@@ -1,0 +1,38 @@
+{
+  "family_id": "oc_v1",
+  "declared": "2026-09-28",
+  "status": "Declared BEFORE any result on these targets exists. Do not edit after the first stage-B run; changes create oc_v2 with its own correction.",
+  "question": "What information known at the close of T predicts the return a buyer at the NEXT OPEN earns over 1, 2, 3 and 5 sessions?",
+  "targets": {
+    "label_oc_1": "open T+1 -> close T+1",
+    "label_oc_2": "open T+1 -> close T+2",
+    "label_oc_3": "open T+1 -> close T+3",
+    "label_oc_5": "open T+1 -> close T+5"
+  },
+  "entry": "OPEN of T+1 (next bar of the symbol)",
+  "exit": "CLOSE of T+h; plain return, no brackets, no stops",
+  "universe": "panel_build v32: equities only (research_common ETF rule etf-v1 + <root>/universe_exclude.txt); point-in-time liquidity floor Rs 1 crore 60-session median turnover",
+  "eligibility": "label_buyable_o1 == 1 for training AND scoring. Rows with 0 stay in the panel and are reported by year, symbol and market day; never silently dropped.",
+  "cost_bps_round_trip": 35,
+  "walk_forward": "the 5 folds of feasibility_test.splits; embargo >= the target's horizon",
+  "primary_tests": 4,
+  "stage_B_feature_screen": {
+    "record_per_feature_and_target": ["N", "mean IC", "IC SD", "IC t-stat", "fold ICs", "positive-fold count", "top-minus-bottom quintile return spread", "spread excess over the market", "p-value", "q-value"],
+    "stability_gate": "IC sign equal to the pooled mean's sign in at least 4 of 5 walk-forward folds",
+    "multiple_testing": "Benjamini-Hochberg q-values across every feature x target cell; a feature passes only with q <= 0.10 AND the stability gate",
+    "note": "the highest IC alone never selects a feature"
+  },
+  "stage_D_gate": {
+    "metric": "walk-forward top-3 net return per trade at 35 bp, eligible rows only, ranked by the raw model score",
+    "interval": "98.75% block-bootstrap interval over trading days (95% with a Bonferroni correction for the 4 targets); the lower bound must be above zero",
+    "recency": "the mean over 2024-01-01 onwards must also be above zero",
+    "also_reported": "excess over buying every eligible stock with the same entry and horizon",
+    "on_pass": "the engine becomes a forward paper-test arm; no real money until the production rule's month-6 check"
+  },
+  "rules": [
+    "Adding any horizon, target, model family, universe or exit rule after this date creates a NEW family with its own correction; it never reuses the 98.75% threshold.",
+    "The ATR bracket labels (close and next-open) stay in the panel as archived comparison targets, not candidates.",
+    "The lockbox is spent; the forward paper ledger is the only untouched evidence.",
+    "Feature expansion (self-relative distances, interactions) is stage C: screened under the stage-B rules above, never added to the panel before stage B has run on the existing features."
+  ]
+}
