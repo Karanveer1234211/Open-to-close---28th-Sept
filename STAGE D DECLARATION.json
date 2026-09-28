@@ -1,0 +1,43 @@
+{
+  "family_id": "oc_v1",
+  "stage": "D",
+  "declared": "2026-09-28",
+  "status": "Declared BEFORE any stage-D model was fitted. stage_d_gate refuses to run if its settings differ from the 'config' block below, and logs this file's hash in the research ledger before the first fit. Any change after the first run is a new family with its own correction.",
+  "question": "Does a model using the existing clean features pick a daily top-3 that earns more than zero after 35 bp, for a buyer at the NEXT OPEN holding to the close of T+h?",
+  "targets": ["label_oc_1", "label_oc_2", "label_oc_3", "label_oc_5"],
+  "gate_per_target": [
+    "walk-forward top-3 net per trade (raw target - 35 bp), eligible rows only, picks ranked by the RAW model score: 98.75% block-bootstrap interval over trading days with its lower bound above zero (95% with a Bonferroni correction for 4 targets) - from EXPERIMENT_OC_FAMILY.json",
+    "mean top-3 net over test days from 2024-01-01 above zero - from EXPERIMENT_OC_FAMILY.json",
+    "top-3 excess over buying every eligible stock (same entry, horizon and cost): 98.75% lower bound above zero - the project's standing rule that a model must beat buying everything; it can only block"
+  ],
+  "on_pass": "the target's engine becomes a forward paper-test arm; no real money until the production rule's month-6 check",
+  "choices_and_why": {
+    "model": "sklearn HistGradientBoostingRegressor, one model family. The challenger test on this panel found no library better than HGB (LightGBM -4 bp [-15, +7], XGBoost 0 [-12, +12], CatBoost -23 [-47, -3], 4-model ensemble +1 [-10, +12]); alternative libraries are on the do-not-reopen list, and every extra model would be another test needing its own correction. Library choice moves results by a few bp; the hole to beat is 16-54 bp.",
+    "features": "every clean feature (signal_engine.clean_features: model-safe columns minus OHLCV, raw levels of outside series and price-level proxies), NO selection. Stage B passed 606 of 684 cells, so selecting would remove little, and using its pass list over overlapping windows would grade the model on its own answer key. Market-level columns stay in: trees can use them to change how stock features are read.",
+    "label": "the model learns each stock's target MINUS the equal-weight mean of eligible stocks that day (the top-3 is chosen within a day, so the day's common move is noise to the ranking), clipped at the training fold's 1st and 99th percentiles (fat tails would otherwise dominate squared error). Scoring always uses the raw target.",
+    "folds": "feasibility_test.splits over every session whose 5-session target is resolved, INCLUDING the spent lockbox period from 2025-03-05: stage B never read those rows and D selects nothing, so they are the least-seen evidence and they carry the 2024+ recency check. Expanding training window, 5-session embargo (>= every horizon).",
+    "fit": "fixed settings, no tuning, no early stopping (it would carve a random, time-leaking validation split). Training rows subsampled to 400,000 per fit, as in feasibility_test and the challenger test.",
+    "selection": "each day the top-3 is chosen among ALL eligible stocks by raw score, before outcomes are known. A pick whose outcome is missing (no bar at T+h) is counted and reported, and the day's mean uses its other picks; ties are broken by symbol and their frequency is reported.",
+    "interval": "circular moving-block bootstrap over trading days, block 10 sessions, 10,000 resamples (2,000 would leave ~12 resamples in each 0.625% tail)"
+  },
+  "not_in_stage_D": [
+    "no feature expansion or per-day rank transforms (stage C)",
+    "no hyperparameter tuning, no second model family, no ranking objective",
+    "no exit-lock or slippage modelling (stage E)",
+    "no re-run to improve a result; a re-run needs a logged reason (a verified bug)"
+  ],
+  "config": {
+    "model": "HistGradientBoostingRegressor",
+    "hgb": {"loss": "squared_error", "max_iter": 200, "learning_rate": 0.05, "max_leaf_nodes": 31,
+            "min_samples_leaf": 200, "l2_regularization": 1.0, "early_stopping": false},
+    "label": "demeaned_by_day_winsorized",
+    "winsor_pct": [1, 99],
+    "fit_cap": 400000,
+    "n_splits": 5, "min_train_frac": 0.35, "embargo": 5,
+    "top_n_primary": 3, "top_n_all": [1, 3, 5, 10],
+    "cost_bps": 35.0,
+    "interval_level": 0.9875, "boot_B": 10000, "boot_block": 10,
+    "recency_start": "2024-01-01",
+    "seed": 7
+  }
+}
