@@ -125,7 +125,7 @@ sys.path.insert(0, str(HERE))
 import research_common as RC     # first: from a subfolder, this folder's copy must win
 import panel_build as PB         # noqa: E402
 
-CODE_VERSION = "stage_b_screen v1.1"   # v1.1: target distributions first; quintile_* names (never run as v1)
+CODE_VERSION = "stage_b_screen v1.2"   # v1.2: run_screen can screen an external feature source (stage C); B unchanged
 FAMILY_FILE = "EXPERIMENT_OC_FAMILY.json"
 FAMILY_ID = "oc_v1"
 ELIG_COL = "label_buyable_o1"
@@ -335,7 +335,9 @@ def _read_col(pp: Path, col: str) -> np.ndarray:
     return pd.to_numeric(s, errors="coerce").to_numpy(dtype="float64")
 
 
-def run_screen(pp: Path, targets: List[str], verbose: bool = True) -> dict:
+def run_screen(pp: Path, targets: List[str], verbose: bool = True, feats: Optional[List[str]] = None,
+               reader=None) -> dict:
+    """feats/reader: screen other features (stage C) - reader(name) returns the column in panel row order."""
     import pyarrow.parquet as pq
     t0 = time.perf_counter()
     cfg = dict(CFG)
@@ -344,7 +346,12 @@ def run_screen(pp: Path, targets: List[str], verbose: bool = True) -> dict:
     if miss:
         raise PreconditionError(f"panel is missing {miss}")
 
-    feats, excluded = clean_feature_list(pp)
+    if feats is None:
+        feats, excluded = clean_feature_list(pp)
+    else:
+        feats, excluded = list(feats), {}
+        RC.assert_no_label_leak(feats, "stage_b_screen (external features)")
+    read = reader or (lambda name: _read_col(pp, name))
     base = pd.read_parquet(pp, columns=["timestamp", "symbol", ELIG_COL])
     ts = _naive(base["timestamp"]).to_numpy(dtype="datetime64[ns]")
     sym = base["symbol"].astype(str).to_numpy()
@@ -398,7 +405,7 @@ def run_screen(pp: Path, targets: List[str], verbose: bool = True) -> dict:
     Q = cfg["quantiles"]
     cells, market_rows, ic_cols = [], [], {}
     for k, f in enumerate(feats, 1):
-        x = _read_col(pp, f)[sel]
+        x = np.asarray(read(f), dtype="float64")[sel]
         fx = np.isfinite(x)
         cover = float(fx.mean()) if len(fx) else 0.0
         # market-level? constant across stocks on (almost) every day

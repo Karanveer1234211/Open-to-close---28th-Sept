@@ -1,0 +1,664 @@
+{
+ "family_id": "oc_v1_c",
+ "stage": "C",
+ "declared": "2026-09-29",
+ "status": "Declared BEFORE any C feature was computed. stage_c_features refuses to run unless the features it produces are exactly this list; its hash goes into the research ledger before anything is computed. Any change after the first run is a new family.",
+ "question": "Do features the library lacks - overnight/intraday decomposition, market-model residuals, lottery and liquidity measures, NSE price-band state, relative position to indicators, interactions - make stage D's model pick a better daily top-3?",
+ "targets": [
+  "label_oc_1",
+  "label_oc_2",
+  "label_oc_3",
+  "label_oc_5"
+ ],
+ "inputs_allowed": "the raw daily cache (open, high, low, close, volume) of each panel symbol; universe membership = panel rows; six panel feature columns for interactions: INDIAVIX_ret_1d, MKT_D_drawdown_252, D_dist_from_52wh, X_turnover_med, D_mdi14_diff1, D_WQ_44. Nothing starting label_ is ever read.",
+ "point_in_time": "every per-symbol feature uses bars up to and including T only; market series and per-date ranks use only stocks in the universe on T; all verified by recomputing on data cut at T (tests) and by a future-return leak screen on the real data (stage_c_screen)",
+ "screen_rule": "stage B's rule on the C features alone, as their own family: per-day Spearman IC, Newey-West t (lag 20), BH q <= 0.10 across all C cells of the 4 targets, sign in >= 4 of 5 folds, research rows only, eligible rows only. Market-level columns (group I) are described, not screened.",
+ "leak_stops": "if any C feature has |IC| >= 0.15 against a target or against label_gap1 (the overnight gap it must not know), or |rho| > 0.15 with any of the next 5 single-day returns, stage_dc_model refuses to run until it is explained",
+ "model": "D_C = stage D's exact model (STAGE_D_DECLARATION.json, re-verified) on all 205 clean features PLUS all 123 C features, no selection (D2 showed selection cost information)",
+ "decision": "compare_d_variants with D as the baseline, identical corrected scoring (ETFs re-drawn out, locked exits moved to the first sellable open): D_C replaces D for a target only if it passes the stage-D gate under that scoring AND its paired daily difference over D has a 98.75% lower bound above zero",
+ "conclusion": "B (existing features, marginal) vs C (new features, marginal) vs D (all 205, model) vs D2 (B-selected, model) vs D_C (205 + C, model), on corrected scoring, per target",
+ "not_in_C": [
+  "no new target, no honest-exit label (a separate family)",
+  "no tuning",
+  "no selection among C features for the model",
+  "no outside data beyond the cache (delivery %, sector maps, F&O lists are not available)"
+ ],
+ "groups": {
+  "A_overnight_intraday": [
+   {
+    "name": "C_on_sum_5",
+    "formula": "sum of ln(open_t/close_t-1) over the last 5 bars",
+    "source": "Lou, Polk & Skouras (2019, JFE) tug of war; Aboody et al. (2018, JFQA); Nair et al. (2024) overnight-return persistence in India"
+   },
+   {
+    "name": "C_on_sum_20",
+    "formula": "sum of ln(open_t/close_t-1) over the last 20 bars",
+    "source": "Lou, Polk & Skouras (2019, JFE) tug of war; Aboody et al. (2018, JFQA); Nair et al. (2024) overnight-return persistence in India"
+   },
+   {
+    "name": "C_on_sum_60",
+    "formula": "sum of ln(open_t/close_t-1) over the last 60 bars",
+    "source": "Lou, Polk & Skouras (2019, JFE) tug of war; Aboody et al. (2018, JFQA); Nair et al. (2024) overnight-return persistence in India"
+   },
+   {
+    "name": "C_id_sum_5",
+    "formula": "sum of ln(close_t/open_t) over the last 5 bars",
+    "source": "Lou, Polk & Skouras (2019, JFE) tug of war; Aboody et al. (2018, JFQA); Nair et al. (2024) overnight-return persistence in India"
+   },
+   {
+    "name": "C_id_sum_20",
+    "formula": "sum of ln(close_t/open_t) over the last 20 bars",
+    "source": "Lou, Polk & Skouras (2019, JFE) tug of war; Aboody et al. (2018, JFQA); Nair et al. (2024) overnight-return persistence in India"
+   },
+   {
+    "name": "C_id_sum_60",
+    "formula": "sum of ln(close_t/open_t) over the last 60 bars",
+    "source": "Lou, Polk & Skouras (2019, JFE) tug of war; Aboody et al. (2018, JFQA); Nair et al. (2024) overnight-return persistence in India"
+   },
+   {
+    "name": "C_tug_20",
+    "formula": "C_on_sum_20 - C_id_sum_20",
+    "source": "Lou, Polk & Skouras (2019, JFE) tug of war; Aboody et al. (2018, JFQA); Nair et al. (2024) overnight-return persistence in India"
+   },
+   {
+    "name": "C_tug_60",
+    "formula": "C_on_sum_60 - C_id_sum_60",
+    "source": "Lou, Polk & Skouras (2019, JFE) tug of war; Aboody et al. (2018, JFQA); Nair et al. (2024) overnight-return persistence in India"
+   },
+   {
+    "name": "C_on_absshare_20",
+    "formula": "sum|overnight| / (sum|overnight| + sum|intraday|), 20 bars",
+    "source": "Lou, Polk & Skouras (2019, JFE) tug of war; Aboody et al. (2018, JFQA); Nair et al. (2024) overnight-return persistence in India"
+   },
+   {
+    "name": "C_on_id_volratio_60",
+    "formula": "std(overnight) / std(intraday), 60 bars",
+    "source": "Lou, Polk & Skouras (2019, JFE) tug of war; Aboody et al. (2018, JFQA); Nair et al. (2024) overnight-return persistence in India"
+   },
+   {
+    "name": "C_on_posfrac_20",
+    "formula": "share of positive overnight log returns, 20 bars",
+    "source": "Lou, Polk & Skouras (2019, JFE) tug of war; Aboody et al. (2018, JFQA); Nair et al. (2024) overnight-return persistence in India"
+   },
+   {
+    "name": "C_id_posfrac_20",
+    "formula": "share of positive intraday log returns, 20 bars",
+    "source": "Lou, Polk & Skouras (2019, JFE) tug of war; Aboody et al. (2018, JFQA); Nair et al. (2024) overnight-return persistence in India"
+   },
+   {
+    "name": "C_on_excess_20",
+    "formula": "C_on_sum_20 minus the universe's summed daily mean overnight return over the same 20 sessions",
+    "source": "Lou, Polk & Skouras (2019, JFE) tug of war; Aboody et al. (2018, JFQA); Nair et al. (2024) overnight-return persistence in India"
+   },
+   {
+    "name": "C_id_excess_20",
+    "formula": "C_id_sum_20 minus the universe's summed daily mean intraday return over the same 20 sessions",
+    "source": "Lou, Polk & Skouras (2019, JFE) tug of war; Aboody et al. (2018, JFQA); Nair et al. (2024) overnight-return persistence in India"
+   }
+  ],
+  "B_market_model": [
+   {
+    "name": "C_beta_60",
+    "formula": "OLS slope of the stock's daily log return on m, 60 bars (m = ln(1 + equal-weight mean simple close-to-close return of the universe that day); overnight/intraday analogues from mean simple overnight/intraday returns)",
+    "source": "Hou & Moskowitz (2005, RFS) price delay; Ang et al. (2006) idiosyncratic volatility; Blitz, Huij & Martens (2011) residual momentum; Blitz et al. (2013, JFM) residual reversal"
+   },
+   {
+    "name": "C_beta_down_120",
+    "formula": "OLS slope on the days with m < 0 within 120 bars",
+    "source": "Hou & Moskowitz (2005, RFS) price delay; Ang et al. (2006) idiosyncratic volatility; Blitz, Huij & Martens (2011) residual momentum; Blitz et al. (2013, JFM) residual reversal"
+   },
+   {
+    "name": "C_beta_updown_120",
+    "formula": "slope on m > 0 days minus slope on m < 0 days, 120 bars",
+    "source": "Hou & Moskowitz (2005, RFS) price delay; Ang et al. (2006) idiosyncratic volatility; Blitz, Huij & Martens (2011) residual momentum; Blitz et al. (2013, JFM) residual reversal"
+   },
+   {
+    "name": "C_beta_on_60",
+    "formula": "OLS slope of the stock's overnight log return on the market's overnight return, 60 bars",
+    "source": "Hou & Moskowitz (2005, RFS) price delay; Ang et al. (2006) idiosyncratic volatility; Blitz, Huij & Martens (2011) residual momentum; Blitz et al. (2013, JFM) residual reversal"
+   },
+   {
+    "name": "C_beta_id_60",
+    "formula": "OLS slope of the stock's intraday log return on the market's intraday return, 60 bars",
+    "source": "Hou & Moskowitz (2005, RFS) price delay; Ang et al. (2006) idiosyncratic volatility; Blitz, Huij & Martens (2011) residual momentum; Blitz et al. (2013, JFM) residual reversal"
+   },
+   {
+    "name": "C_r2_60",
+    "formula": "R-squared of the 60-bar market regression (price synchronicity)",
+    "source": "Hou & Moskowitz (2005, RFS) price delay; Ang et al. (2006) idiosyncratic volatility; Blitz, Huij & Martens (2011) residual momentum; Blitz et al. (2013, JFM) residual reversal"
+   },
+   {
+    "name": "C_idio_vol_60",
+    "formula": "sqrt(var(r) * (1 - R2)) over 60 bars",
+    "source": "Hou & Moskowitz (2005, RFS) price delay; Ang et al. (2006) idiosyncratic volatility; Blitz, Huij & Martens (2011) residual momentum; Blitz et al. (2013, JFM) residual reversal"
+   },
+   {
+    "name": "C_delay_120",
+    "formula": "1 - R2(r on m_t) / R2(r on m_t..m_t-4), 120 bars",
+    "source": "Hou & Moskowitz (2005, RFS) price delay; Ang et al. (2006) idiosyncratic volatility; Blitz, Huij & Martens (2011) residual momentum; Blitz et al. (2013, JFM) residual reversal"
+   },
+   {
+    "name": "C_lagbeta_120",
+    "formula": "sum of the coefficients on m_t-1..m_t-4 in the lagged regression, 120 bars",
+    "source": "Hou & Moskowitz (2005, RFS) price delay; Ang et al. (2006) idiosyncratic volatility; Blitz, Huij & Martens (2011) residual momentum; Blitz et al. (2013, JFM) residual reversal"
+   },
+   {
+    "name": "C_coskew_120",
+    "formula": "E[(r - mean r)(m - mean m)^2] / (sd r * var m), 120 bars",
+    "source": "Harvey & Siddique (2000) coskewness"
+   },
+   {
+    "name": "C_resid_1d",
+    "formula": "today's residual e_t = r_t - alpha_t - beta_t m_t (alpha, beta from the 60-bar window ending today)",
+    "source": "Hou & Moskowitz (2005, RFS) price delay; Ang et al. (2006) idiosyncratic volatility; Blitz, Huij & Martens (2011) residual momentum; Blitz et al. (2013, JFM) residual reversal"
+   },
+   {
+    "name": "C_resid_5d",
+    "formula": "sum of e over the last 5 bars (each e from its own window)",
+    "source": "Hou & Moskowitz (2005, RFS) price delay; Ang et al. (2006) idiosyncratic volatility; Blitz, Huij & Martens (2011) residual momentum; Blitz et al. (2013, JFM) residual reversal"
+   },
+   {
+    "name": "C_resid_20d",
+    "formula": "sum of e over the last 20 bars",
+    "source": "Hou & Moskowitz (2005, RFS) price delay; Ang et al. (2006) idiosyncratic volatility; Blitz, Huij & Martens (2011) residual momentum; Blitz et al. (2013, JFM) residual reversal"
+   },
+   {
+    "name": "C_resid_5d_z",
+    "formula": "C_resid_5d / (C_idio_vol_60 * sqrt 5)",
+    "source": "Hou & Moskowitz (2005, RFS) price delay; Ang et al. (2006) idiosyncratic volatility; Blitz, Huij & Martens (2011) residual momentum; Blitz et al. (2013, JFM) residual reversal"
+   },
+   {
+    "name": "C_resid_20d_z",
+    "formula": "C_resid_20d / (C_idio_vol_60 * sqrt 20)",
+    "source": "Hou & Moskowitz (2005, RFS) price delay; Ang et al. (2006) idiosyncratic volatility; Blitz, Huij & Martens (2011) residual momentum; Blitz et al. (2013, JFM) residual reversal"
+   },
+   {
+    "name": "C_resid_mom_z",
+    "formula": "sum of e over bars t-250..t-21 divided by (sd of e over that window * sqrt 230)",
+    "source": "Hou & Moskowitz (2005, RFS) price delay; Ang et al. (2006) idiosyncratic volatility; Blitz, Huij & Martens (2011) residual momentum; Blitz et al. (2013, JFM) residual reversal"
+   },
+   {
+    "name": "C_idio_skew_60",
+    "formula": "skewness of e over 60 bars",
+    "source": "Hou & Moskowitz (2005, RFS) price delay; Ang et al. (2006) idiosyncratic volatility; Blitz, Huij & Martens (2011) residual momentum; Blitz et al. (2013, JFM) residual reversal"
+   },
+   {
+    "name": "C_max1_resid_21",
+    "formula": "max of e over 21 bars",
+    "source": "Bali, Cakici & Whitelaw (2011, JFE), idiosyncratic version"
+   }
+  ],
+  "C_lottery": [
+   {
+    "name": "C_max1_21",
+    "formula": "max simple close-to-close return, 21 bars",
+    "source": "Bali, Cakici & Whitelaw (2011, JFE) MAX; 'The MAX effect: lottery stocks with price limits' (J. Financial Markets 2018)"
+   },
+   {
+    "name": "C_max5_21",
+    "formula": "mean of the top 5 simple returns, 21 bars",
+    "source": "Bali, Cakici & Whitelaw (2011, JFE) MAX; 'The MAX effect: lottery stocks with price limits' (J. Financial Markets 2018)"
+   },
+   {
+    "name": "C_min1_21",
+    "formula": "min simple return, 21 bars",
+    "source": "Bali, Cakici & Whitelaw (2011, JFE) MAX; 'The MAX effect: lottery stocks with price limits' (J. Financial Markets 2018)"
+   },
+   {
+    "name": "C_maxmin_21",
+    "formula": "C_max1_21 + C_min1_21",
+    "source": "Bali, Cakici & Whitelaw (2011, JFE) MAX; 'The MAX effect: lottery stocks with price limits' (J. Financial Markets 2018)"
+   },
+   {
+    "name": "C_max_to_vol",
+    "formula": "C_max1_21 / std(simple returns, 60 bars)",
+    "source": "Bali, Cakici & Whitelaw (2011, JFE) MAX; 'The MAX effect: lottery stocks with price limits' (J. Financial Markets 2018)"
+   }
+  ],
+  "D_liquidity": [
+   {
+    "name": "C_cs_spread_20",
+    "formula": "Corwin-Schultz high-low spread, overnight-adjusted, negatives set to 0, mean over 20 bars",
+    "source": "Corwin & Schultz (2012, JF); Abdi & Ranaldo (2017, RFS); Lesmond et al. (1999); Chordia, Subrahmanyam & Anshuman (2001)"
+   },
+   {
+    "name": "C_cs_spread_60",
+    "formula": "Corwin-Schultz high-low spread, overnight-adjusted, negatives set to 0, mean over 60 bars",
+    "source": "Corwin & Schultz (2012, JF); Abdi & Ranaldo (2017, RFS); Lesmond et al. (1999); Chordia, Subrahmanyam & Anshuman (2001)"
+   },
+   {
+    "name": "C_ar_spread_20",
+    "formula": "Abdi-Ranaldo spread sqrt(max(mean 4(c_t-1 - eta_t-1)(c_t-1 - eta_t), 0)), eta = mean log(high, low), 20 pairs",
+    "source": "Corwin & Schultz (2012, JF); Abdi & Ranaldo (2017, RFS); Lesmond et al. (1999); Chordia, Subrahmanyam & Anshuman (2001)"
+   },
+   {
+    "name": "C_ar_spread_60",
+    "formula": "Abdi-Ranaldo spread sqrt(max(mean 4(c_t-1 - eta_t-1)(c_t-1 - eta_t), 0)), eta = mean log(high, low), 60 pairs",
+    "source": "Corwin & Schultz (2012, JF); Abdi & Ranaldo (2017, RFS); Lesmond et al. (1999); Chordia, Subrahmanyam & Anshuman (2001)"
+   },
+   {
+    "name": "C_zero_ret_frac_60",
+    "formula": "share of bars with close = previous close, 60 bars",
+    "source": "Corwin & Schultz (2012, JF); Abdi & Ranaldo (2017, RFS); Lesmond et al. (1999); Chordia, Subrahmanyam & Anshuman (2001)"
+   },
+   {
+    "name": "C_frozen_frac_20",
+    "formula": "share of bars with open = high = low = close, 20 bars",
+    "source": "Corwin & Schultz (2012, JF); Abdi & Ranaldo (2017, RFS); Lesmond et al. (1999); Chordia, Subrahmanyam & Anshuman (2001)"
+   },
+   {
+    "name": "C_turn_shock_1",
+    "formula": "ln(turnover_t / median turnover over t-20..t-1), turnover = close x volume",
+    "source": "Corwin & Schultz (2012, JF); Abdi & Ranaldo (2017, RFS); Lesmond et al. (1999); Chordia, Subrahmanyam & Anshuman (2001)"
+   },
+   {
+    "name": "C_turn_shock_5",
+    "formula": "ln(mean turnover t-4..t / median turnover t-64..t-5)",
+    "source": "Corwin & Schultz (2012, JF); Abdi & Ranaldo (2017, RFS); Lesmond et al. (1999); Chordia, Subrahmanyam & Anshuman (2001)"
+   },
+   {
+    "name": "C_turn_cv_20",
+    "formula": "std / mean of turnover, 20 bars",
+    "source": "Corwin & Schultz (2012, JF); Abdi & Ranaldo (2017, RFS); Lesmond et al. (1999); Chordia, Subrahmanyam & Anshuman (2001)"
+   },
+   {
+    "name": "C_amihud_shock",
+    "formula": "ln(Amihud_20 today / median of Amihud_20 over the last 250 bars); Amihud_20 = mean |r| / turnover over 20 bars",
+    "source": "Corwin & Schultz (2012, JF); Abdi & Ranaldo (2017, RFS); Lesmond et al. (1999); Chordia, Subrahmanyam & Anshuman (2001)"
+   },
+   {
+    "name": "C_pv_corr_20",
+    "formula": "correlation of r with ln turnover, 20 bars",
+    "source": "Corwin & Schultz (2012, JF); Abdi & Ranaldo (2017, RFS); Lesmond et al. (1999); Chordia, Subrahmanyam & Anshuman (2001)"
+   },
+   {
+    "name": "C_absret_turn_corr_20",
+    "formula": "correlation of |r| with ln turnover, 20 bars",
+    "source": "Corwin & Schultz (2012, JF); Abdi & Ranaldo (2017, RFS); Lesmond et al. (1999); Chordia, Subrahmanyam & Anshuman (2001)"
+   }
+  ],
+  "E_price_bands": [
+   {
+    "name": "C_lock_up",
+    "formula": "1 if today closed locked at an upper band (a close within one tick (NSE tick size for the date) of a 2/5/10/20% move from the previous close AND close = high)",
+    "source": "NSE daily price bands 2/5/10/20%; magnet effect (Subrahmanyam 1994; Cho et al. 2003); stage-D forensics found 14.4% of oc_1 exits locked at the lower band"
+   },
+   {
+    "name": "C_lock_dn",
+    "formula": "1 if today closed locked at a lower band (a close within one tick (NSE tick size for the date) of a 2/5/10/20% move from the previous close AND close = low)",
+    "source": "NSE daily price bands 2/5/10/20%; magnet effect (Subrahmanyam 1994; Cho et al. 2003); stage-D forensics found 14.4% of oc_1 exits locked at the lower band"
+   },
+   {
+    "name": "C_n_lock_up_20",
+    "formula": "count of upper-lock closes, 20 bars",
+    "source": "NSE daily price bands 2/5/10/20%; magnet effect (Subrahmanyam 1994; Cho et al. 2003); stage-D forensics found 14.4% of oc_1 exits locked at the lower band"
+   },
+   {
+    "name": "C_n_lock_dn_20",
+    "formula": "count of lower-lock closes, 20 bars",
+    "source": "NSE daily price bands 2/5/10/20%; magnet effect (Subrahmanyam 1994; Cho et al. 2003); stage-D forensics found 14.4% of oc_1 exits locked at the lower band"
+   },
+   {
+    "name": "C_n_lock_dn_60",
+    "formula": "count of lower-lock closes, 60 bars",
+    "source": "NSE daily price bands 2/5/10/20%; magnet effect (Subrahmanyam 1994; Cho et al. 2003); stage-D forensics found 14.4% of oc_1 exits locked at the lower band"
+   },
+   {
+    "name": "C_days_since_lock_dn",
+    "formula": "bars since the last lower-lock close, capped at 250",
+    "source": "NSE daily price bands 2/5/10/20%; magnet effect (Subrahmanyam 1994; Cho et al. 2003); stage-D forensics found 14.4% of oc_1 exits locked at the lower band"
+   },
+   {
+    "name": "C_days_since_lock_up",
+    "formula": "bars since the last upper-lock close, capped at 250",
+    "source": "NSE daily price bands 2/5/10/20%; magnet effect (Subrahmanyam 1994; Cho et al. 2003); stage-D forensics found 14.4% of oc_1 exits locked at the lower band"
+   },
+   {
+    "name": "C_streak_lock_dn",
+    "formula": "consecutive lower-lock closes ending today",
+    "source": "NSE daily price bands 2/5/10/20%; magnet effect (Subrahmanyam 1994; Cho et al. 2003); stage-D forensics found 14.4% of oc_1 exits locked at the lower band"
+   },
+   {
+    "name": "C_streak_lock_up",
+    "formula": "consecutive upper-lock closes ending today",
+    "source": "NSE daily price bands 2/5/10/20%; magnet effect (Subrahmanyam 1994; Cho et al. 2003); stage-D forensics found 14.4% of oc_1 exits locked at the lower band"
+   },
+   {
+    "name": "C_open_lock_dn_20",
+    "formula": "count of opens locked at a lower band (open within one tick of a band below the previous close AND open = low), 20 bars",
+    "source": "NSE daily price bands 2/5/10/20%; magnet effect (Subrahmanyam 1994; Cho et al. 2003); stage-D forensics found 14.4% of oc_1 exits locked at the lower band"
+   },
+   {
+    "name": "C_band_proxy_250",
+    "formula": "max |simple return| over 250 bars (a proxy for the stock's band width)",
+    "source": "NSE daily price bands 2/5/10/20%; magnet effect (Subrahmanyam 1994; Cho et al. 2003); stage-D forensics found 14.4% of oc_1 exits locked at the lower band"
+   },
+   {
+    "name": "C_ret_to_band",
+    "formula": "today's simple return / C_band_proxy_250 (+1 / -1 = at the stock's usual limit)",
+    "source": "NSE daily price bands 2/5/10/20%; magnet effect (Subrahmanyam 1994; Cho et al. 2003); stage-D forensics found 14.4% of oc_1 exits locked at the lower band"
+   }
+  ],
+  "F_relative_position": [
+   {
+    "name": "C_dist_ema20_atr",
+    "formula": "(close - EMA20) / ATR14",
+    "source": "relative position to indicators (requested); ATR14 = mean true range over 14 bars; VWAP_n = sum(typical x volume)/sum(volume), typical = (H+L+C)/3"
+   },
+   {
+    "name": "C_dist_sma50_atr",
+    "formula": "(close - SMA50) / ATR14",
+    "source": "relative position to indicators (requested); ATR14 = mean true range over 14 bars; VWAP_n = sum(typical x volume)/sum(volume), typical = (H+L+C)/3"
+   },
+   {
+    "name": "C_dist_sma200_atr",
+    "formula": "(close - SMA200) / ATR14",
+    "source": "relative position to indicators (requested); ATR14 = mean true range over 14 bars; VWAP_n = sum(typical x volume)/sum(volume), typical = (H+L+C)/3"
+   },
+   {
+    "name": "C_dist_vwap20_atr",
+    "formula": "(close - VWAP20) / ATR14",
+    "source": "relative position to indicators (requested); ATR14 = mean true range over 14 bars; VWAP_n = sum(typical x volume)/sum(volume), typical = (H+L+C)/3"
+   },
+   {
+    "name": "C_dist_vwap60_atr",
+    "formula": "(close - VWAP60) / ATR14",
+    "source": "relative position to indicators (requested); ATR14 = mean true range over 14 bars; VWAP_n = sum(typical x volume)/sum(volume), typical = (H+L+C)/3"
+   },
+   {
+    "name": "C_ema20_ema50_atr",
+    "formula": "(EMA20 - EMA50) / ATR14",
+    "source": "relative position to indicators (requested); ATR14 = mean true range over 14 bars; VWAP_n = sum(typical x volume)/sum(volume), typical = (H+L+C)/3"
+   },
+   {
+    "name": "C_close_typical_atr",
+    "formula": "(close - typical) / ATR14",
+    "source": "relative position to indicators (requested); ATR14 = mean true range over 14 bars; VWAP_n = sum(typical x volume)/sum(volume), typical = (H+L+C)/3"
+   },
+   {
+    "name": "C_clv",
+    "formula": "((close-low) - (high-close)) / (high-low); 0 if high = low",
+    "source": "relative position to indicators (requested); ATR14 = mean true range over 14 bars; VWAP_n = sum(typical x volume)/sum(volume), typical = (H+L+C)/3"
+   },
+   {
+    "name": "C_clv_mean_5",
+    "formula": "mean C_clv, 5 bars",
+    "source": "relative position to indicators (requested); ATR14 = mean true range over 14 bars; VWAP_n = sum(typical x volume)/sum(volume), typical = (H+L+C)/3"
+   },
+   {
+    "name": "C_clv_mean_20",
+    "formula": "mean C_clv, 20 bars",
+    "source": "relative position to indicators (requested); ATR14 = mean true range over 14 bars; VWAP_n = sum(typical x volume)/sum(volume), typical = (H+L+C)/3"
+   },
+   {
+    "name": "C_upper_shadow_atr",
+    "formula": "(high - max(open, close)) / ATR14",
+    "source": "relative position to indicators (requested); ATR14 = mean true range over 14 bars; VWAP_n = sum(typical x volume)/sum(volume), typical = (H+L+C)/3"
+   },
+   {
+    "name": "C_lower_shadow_atr",
+    "formula": "(min(open, close) - low) / ATR14",
+    "source": "relative position to indicators (requested); ATR14 = mean true range over 14 bars; VWAP_n = sum(typical x volume)/sum(volume), typical = (H+L+C)/3"
+   },
+   {
+    "name": "C_range_pctile_250",
+    "formula": "share of the last 250 bars whose (high-low)/close is below today's",
+    "source": "relative position to indicators (requested); ATR14 = mean true range over 14 bars; VWAP_n = sum(typical x volume)/sum(volume), typical = (H+L+C)/3"
+   },
+   {
+    "name": "C_turn_pctile_250",
+    "formula": "share of the last 250 bars whose turnover is below today's",
+    "source": "relative position to indicators (requested); ATR14 = mean true range over 14 bars; VWAP_n = sum(typical x volume)/sum(volume), typical = (H+L+C)/3"
+   },
+   {
+    "name": "C_absret_pctile_250",
+    "formula": "share of the last 250 bars whose |return| is below today's",
+    "source": "relative position to indicators (requested); ATR14 = mean true range over 14 bars; VWAP_n = sum(typical x volume)/sum(volume), typical = (H+L+C)/3"
+   },
+   {
+    "name": "C_ret_z_60",
+    "formula": "today's simple return / std over 60 bars",
+    "source": "relative position to indicators (requested); ATR14 = mean true range over 14 bars; VWAP_n = sum(typical x volume)/sum(volume), typical = (H+L+C)/3"
+   },
+   {
+    "name": "C_on_z_60",
+    "formula": "today's overnight log return / its std over 60 bars",
+    "source": "relative position to indicators (requested); ATR14 = mean true range over 14 bars; VWAP_n = sum(typical x volume)/sum(volume), typical = (H+L+C)/3"
+   },
+   {
+    "name": "C_id_z_60",
+    "formula": "today's intraday log return / its std over 60 bars",
+    "source": "relative position to indicators (requested); ATR14 = mean true range over 14 bars; VWAP_n = sum(typical x volume)/sum(volume), typical = (H+L+C)/3"
+   },
+   {
+    "name": "C_eff_10",
+    "formula": "|close_t - close_t-10| / sum |close_i - close_i-1| over 10 bars (Kaufman efficiency)",
+    "source": "relative position to indicators (requested); ATR14 = mean true range over 14 bars; VWAP_n = sum(typical x volume)/sum(volume), typical = (H+L+C)/3"
+   },
+   {
+    "name": "C_eff_20",
+    "formula": "same over 20 bars",
+    "source": "relative position to indicators (requested); ATR14 = mean true range over 14 bars; VWAP_n = sum(typical x volume)/sum(volume), typical = (H+L+C)/3"
+   },
+   {
+    "name": "C_streak",
+    "formula": "signed count of consecutive up (+) or down (-) closes ending today",
+    "source": "relative position to indicators (requested); ATR14 = mean true range over 14 bars; VWAP_n = sum(typical x volume)/sum(volume), typical = (H+L+C)/3"
+   },
+   {
+    "name": "C_days_since_hi250",
+    "formula": "bars since the 250-bar high close, / 250",
+    "source": "relative position to indicators (requested); ATR14 = mean true range over 14 bars; VWAP_n = sum(typical x volume)/sum(volume), typical = (H+L+C)/3"
+   },
+   {
+    "name": "C_days_since_lo250",
+    "formula": "bars since the 250-bar low close, / 250",
+    "source": "relative position to indicators (requested); ATR14 = mean true range over 14 bars; VWAP_n = sum(typical x volume)/sum(volume), typical = (H+L+C)/3"
+   }
+  ],
+  "G_momentum_seasonal": [
+   {
+    "name": "C_mom_12_1",
+    "formula": "ln(close_t-21 / close_t-252)",
+    "source": "Jegadeesh & Titman (1993); Da, Gurun & Warachka (2014, RFS) frog in the pan; Heston & Sadka (2008, JFE) seasonality"
+   },
+   {
+    "name": "C_mom_6_1",
+    "formula": "ln(close_t-21 / close_t-126)",
+    "source": "Jegadeesh & Titman (1993); Da, Gurun & Warachka (2014, RFS) frog in the pan; Heston & Sadka (2008, JFE) seasonality"
+   },
+   {
+    "name": "C_fip_id",
+    "formula": "sign(ln(close_t-21/close_t-251)) x (share of negative - share of positive daily returns over t-250..t-21)",
+    "source": "Jegadeesh & Titman (1993); Da, Gurun & Warachka (2014, RFS) frog in the pan; Heston & Sadka (2008, JFE) seasonality"
+   },
+   {
+    "name": "C_ret_2_5",
+    "formula": "ln(close_t-1 / close_t-5)",
+    "source": "Jegadeesh & Titman (1993); Da, Gurun & Warachka (2014, RFS) frog in the pan; Heston & Sadka (2008, JFE) seasonality"
+   },
+   {
+    "name": "C_season_month",
+    "formula": "mean log monthly return of the same calendar month in the previous 5 years (at least 2 needed)",
+    "source": "Jegadeesh & Titman (1993); Da, Gurun & Warachka (2014, RFS) frog in the pan; Heston & Sadka (2008, JFE) seasonality"
+   }
+  ],
+  "H_interactions": [
+   {
+    "name": "I_cgw_1",
+    "formula": "today's simple return x C_turn_shock_1",
+    "source": "Campbell, Grossman & Wang (1993, QJE) volume and reversal; Avramov, Chordia & Goyal (2006); high-volume overnight premium / intraday discount; conditional beta; pr() = per-date percentile rank among universe stocks"
+   },
+   {
+    "name": "I_cgw_5",
+    "formula": "C_resid_5d x C_turn_shock_5",
+    "source": "Campbell, Grossman & Wang (1993, QJE) volume and reversal; Avramov, Chordia & Goyal (2006); high-volume overnight premium / intraday discount; conditional beta; pr() = per-date percentile rank among universe stocks"
+   },
+   {
+    "name": "I_gap_turn",
+    "formula": "today's overnight log return x C_turn_shock_1",
+    "source": "Campbell, Grossman & Wang (1993, QJE) volume and reversal; Avramov, Chordia & Goyal (2006); high-volume overnight premium / intraday discount; conditional beta; pr() = per-date percentile rank among universe stocks"
+   },
+   {
+    "name": "I_id_turn",
+    "formula": "today's intraday log return x C_turn_shock_1",
+    "source": "Campbell, Grossman & Wang (1993, QJE) volume and reversal; Avramov, Chordia & Goyal (2006); high-volume overnight premium / intraday discount; conditional beta; pr() = per-date percentile rank among universe stocks"
+   },
+   {
+    "name": "I_rev_spread",
+    "formula": "C_resid_5d_z x pr(C_cs_spread_20)",
+    "source": "Campbell, Grossman & Wang (1993, QJE) volume and reversal; Avramov, Chordia & Goyal (2006); high-volume overnight premium / intraday discount; conditional beta; pr() = per-date percentile rank among universe stocks"
+   },
+   {
+    "name": "I_max_spread",
+    "formula": "C_max1_21 x pr(C_cs_spread_20)",
+    "source": "Campbell, Grossman & Wang (1993, QJE) volume and reversal; Avramov, Chordia & Goyal (2006); high-volume overnight premium / intraday discount; conditional beta; pr() = per-date percentile rank among universe stocks"
+   },
+   {
+    "name": "I_beta_mkt",
+    "formula": "C_beta_60 x today's m",
+    "source": "Campbell, Grossman & Wang (1993, QJE) volume and reversal; Avramov, Chordia & Goyal (2006); high-volume overnight premium / intraday discount; conditional beta; pr() = per-date percentile rank among universe stocks"
+   },
+   {
+    "name": "I_beta_vix",
+    "formula": "C_beta_60 x INDIAVIX_ret_1d (panel column)",
+    "source": "Campbell, Grossman & Wang (1993, QJE) volume and reversal; Avramov, Chordia & Goyal (2006); high-volume overnight premium / intraday discount; conditional beta; pr() = per-date percentile rank among universe stocks"
+   },
+   {
+    "name": "I_lowvol_dd",
+    "formula": "(1 - pr(C_idio_vol_60)) x MKT_D_drawdown_252 (panel column)",
+    "source": "Campbell, Grossman & Wang (1993, QJE) volume and reversal; Avramov, Chordia & Goyal (2006); high-volume overnight premium / intraday discount; conditional beta; pr() = per-date percentile rank among universe stocks"
+   },
+   {
+    "name": "I_hi52_turn",
+    "formula": "D_dist_from_52wh (panel) x C_turn_shock_5",
+    "source": "Campbell, Grossman & Wang (1993, QJE) volume and reversal; Avramov, Chordia & Goyal (2006); high-volume overnight premium / intraday discount; conditional beta; pr() = per-date percentile rank among universe stocks"
+   },
+   {
+    "name": "I_tug_turn",
+    "formula": "C_tug_20 x pr(X_turnover_med (panel))",
+    "source": "Campbell, Grossman & Wang (1993, QJE) volume and reversal; Avramov, Chordia & Goyal (2006); high-volume overnight premium / intraday discount; conditional beta; pr() = per-date percentile rank among universe stocks"
+   },
+   {
+    "name": "I_lockdn_turn",
+    "formula": "C_lock_dn x C_turn_shock_1",
+    "source": "Campbell, Grossman & Wang (1993, QJE) volume and reversal; Avramov, Chordia & Goyal (2006); high-volume overnight premium / intraday discount; conditional beta; pr() = per-date percentile rank among universe stocks"
+   },
+   {
+    "name": "I_mdi_vol",
+    "formula": "D_mdi14_diff1 (panel) x pr(C_idio_vol_60)",
+    "source": "Campbell, Grossman & Wang (1993, QJE) volume and reversal; Avramov, Chordia & Goyal (2006); high-volume overnight premium / intraday discount; conditional beta; pr() = per-date percentile rank among universe stocks"
+   },
+   {
+    "name": "I_wq44_turn",
+    "formula": "D_WQ_44 (panel) x C_turn_shock_5",
+    "source": "Campbell, Grossman & Wang (1993, QJE) volume and reversal; Avramov, Chordia & Goyal (2006); high-volume overnight premium / intraday discount; conditional beta; pr() = per-date percentile rank among universe stocks"
+   },
+   {
+    "name": "I_rev_disp",
+    "formula": "today's simple return x M_disp_1d",
+    "source": "Campbell, Grossman & Wang (1993, QJE) volume and reversal; Avramov, Chordia & Goyal (2006); high-volume overnight premium / intraday discount; conditional beta; pr() = per-date percentile rank among universe stocks"
+   },
+   {
+    "name": "I_on_turn20",
+    "formula": "C_on_sum_20 x C_turn_shock_5",
+    "source": "Campbell, Grossman & Wang (1993, QJE) volume and reversal; Avramov, Chordia & Goyal (2006); high-volume overnight premium / intraday discount; conditional beta; pr() = per-date percentile rank among universe stocks"
+   }
+  ],
+  "I_market_state": [
+   {
+    "name": "M_disp_1d",
+    "formula": "cross-sectional std of simple returns across universe stocks today",
+    "source": "market state from the universe itself (no outside series); NBER work on smoothed overnight market returns forecasting intraday mean reversion; cross-sectional dispersion"
+   },
+   {
+    "name": "M_breadth_up",
+    "formula": "share of universe stocks up today",
+    "source": "market state from the universe itself (no outside series); NBER work on smoothed overnight market returns forecasting intraday mean reversion; cross-sectional dispersion"
+   },
+   {
+    "name": "M_share_lock_dn",
+    "formula": "share of universe stocks closing locked at a lower band today",
+    "source": "market state from the universe itself (no outside series); NBER work on smoothed overnight market returns forecasting intraday mean reversion; cross-sectional dispersion"
+   },
+   {
+    "name": "M_share_lock_up",
+    "formula": "share closing locked at an upper band today",
+    "source": "market state from the universe itself (no outside series); NBER work on smoothed overnight market returns forecasting intraday mean reversion; cross-sectional dispersion"
+   },
+   {
+    "name": "M_on_1d",
+    "formula": "equal-weight mean simple overnight return today",
+    "source": "market state from the universe itself (no outside series); NBER work on smoothed overnight market returns forecasting intraday mean reversion; cross-sectional dispersion"
+   },
+   {
+    "name": "M_id_1d",
+    "formula": "equal-weight mean simple intraday return today",
+    "source": "market state from the universe itself (no outside series); NBER work on smoothed overnight market returns forecasting intraday mean reversion; cross-sectional dispersion"
+   },
+   {
+    "name": "M_on_sum_20",
+    "formula": "sum of M_on_1d over the last 20 sessions",
+    "source": "market state from the universe itself (no outside series); NBER work on smoothed overnight market returns forecasting intraday mean reversion; cross-sectional dispersion"
+   },
+   {
+    "name": "M_id_sum_20",
+    "formula": "sum of M_id_1d over the last 20 sessions",
+    "source": "market state from the universe itself (no outside series); NBER work on smoothed overnight market returns forecasting intraday mean reversion; cross-sectional dispersion"
+   },
+   {
+    "name": "M_disp_z_60",
+    "formula": "(M_disp_1d - its 60-session mean) / its 60-session std",
+    "source": "market state from the universe itself (no outside series); NBER work on smoothed overnight market returns forecasting intraday mean reversion; cross-sectional dispersion"
+   },
+   {
+    "name": "M_cal_days_to_month_end",
+    "formula": "calendar days to the end of the month",
+    "source": "market state from the universe itself (no outside series); NBER work on smoothed overnight market returns forecasting intraday mean reversion; cross-sectional dispersion"
+   }
+  ],
+  "J_date_ranks": [
+   {
+    "name": "PR_C_idio_vol_60",
+    "formula": "per-date percentile rank of C_idio_vol_60 among universe stocks",
+    "source": "removes drift in the level over time"
+   },
+   {
+    "name": "PR_C_beta_60",
+    "formula": "per-date percentile rank of C_beta_60 among universe stocks",
+    "source": "removes drift in the level over time"
+   },
+   {
+    "name": "PR_C_cs_spread_20",
+    "formula": "per-date percentile rank of C_cs_spread_20 among universe stocks",
+    "source": "removes drift in the level over time"
+   },
+   {
+    "name": "PR_C_max1_21",
+    "formula": "per-date percentile rank of C_max1_21 among universe stocks",
+    "source": "removes drift in the level over time"
+   },
+   {
+    "name": "PR_C_resid_5d_z",
+    "formula": "per-date percentile rank of C_resid_5d_z among universe stocks",
+    "source": "removes drift in the level over time"
+   },
+   {
+    "name": "PR_C_tug_20",
+    "formula": "per-date percentile rank of C_tug_20 among universe stocks",
+    "source": "removes drift in the level over time"
+   },
+   {
+    "name": "PR_C_turn_shock_1",
+    "formula": "per-date percentile rank of C_turn_shock_1 among universe stocks",
+    "source": "removes drift in the level over time"
+   },
+   {
+    "name": "PR_C_on_sum_20",
+    "formula": "per-date percentile rank of C_on_sum_20 among universe stocks",
+    "source": "removes drift in the level over time"
+   }
+  ]
+ },
+ "feature_count": 123
+}

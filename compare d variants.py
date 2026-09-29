@@ -48,8 +48,8 @@ import stage_d_gate as SD          # noqa: E402
 import stage_d_forensics as SF     # noqa: E402
 import stage_d2_nested as SD2      # noqa: E402
 
-CODE_VERSION = "compare_d_variants v1"
-RUN_KINDS = ("stage_d_gate", "stage_d2_run")
+CODE_VERSION = "compare_d_variants v1.1"   # v1.1: D_C runs (stage C) join the comparison
+RUN_KINDS = ("stage_d_gate", "stage_d2_run", "stage_dc_run")
 
 
 class PreconditionError(SystemExit):
@@ -69,10 +69,11 @@ def resolve_runs(pp: Path, runs: Optional[List[str]]) -> List[str]:
             raise PreconditionError(f"not stage-D runs in this panel's ledger: {bad}")
         return runs
     base = [e["run_id"] for e in E if e.get("kind") == "stage_d_gate"]
-    var = [e["run_id"] for e in E if e.get("kind") == "stage_d2_run"]
+    var = [[e["run_id"] for e in E if e.get("kind") == k] for k in ("stage_d2_run", "stage_dc_run")]
+    var = [v[-1] for v in var if v]
     if not base or not var:
-        raise PreconditionError("need a stage-D run and a D2 run on record (or pass --runs)")
-    return [base[-1], var[-1]]
+        raise PreconditionError("need a stage-D run and a D2 or D_C run on record (or pass --runs)")
+    return [base[-1]] + var
 
 
 def score_run(pp: Path, root: Path, folder: Path, targets: List[str], etf: set, cfg: dict,
@@ -243,7 +244,8 @@ def main(argv=None) -> int:
         cls = pd.DataFrame({"symbol": syms, "etf": [RC.is_etf_symbol(s, extra) for s in syms]})
         etf_note = "by the name rule - no bhavcopy given, so ETFs with plain names stay in"
     etf = set(cls.loc[cls["etf"], "symbol"])
-    labels = {r: ("D2" if r.startswith("STAGED2") else "D") + f" ({r})" for r in runs}
+    labels = {r: ("DC" if r.startswith("STAGEDC") else "D2" if r.startswith("STAGED2") else "D") + f" ({r})"
+              for r in runs}
     t0 = time.perf_counter()
     scored = {}
     for r in runs:
