@@ -1,0 +1,32 @@
+{
+  "family_id": "oc_v1",
+  "stage": "D2",
+  "declared": "2026-09-29",
+  "status": "Declared BEFORE any D2 model was fitted. stage_d2_nested refuses to run if its selection settings differ from 'config' below, uses stage D's model settings unchanged (their own declaration is re-verified at start), and logs this file's hash in the research ledger before the first fit.",
+  "question": "Does a model built only on stage B's strongest non-redundant features pick a better daily top-3 than stage D's model on all 205 clean features?",
+  "why_nested": "Stage B's pass list was chosen on 2019-07..2025-02, which overlaps stage D's test windows (2020-01..2026-09). Using that list would let the model be graded on its own answer key. So inside EACH fold, B's rule is re-run on that fold's training rows only, and the features it picks are used for that fold's test window. No test-window row ever influences which features are used.",
+  "selection_per_fold": [
+    "rows: that fold's training rows only (eligible, target known), exactly those stage D trained on",
+    "per-day Spearman rank IC for every stock-level feature x every target; Newey-West t (lag 20); two-sided p",
+    "Benjamini-Hochberg q over every (feature, target) cell of that fold, pooled across the 4 targets, as in stage B",
+    "stability: the IC has the pooled sign in at least 4 of 5 equal consecutive blocks of the fold's training sessions",
+    "pass = q <= 0.10 AND stable; then ONE feature per family (|rank correlation| >= 0.80 on 60 sampled training days; the strongest |t| leads)",
+    "plus every market-level column (the same value for every stock on a day): stage B cannot screen them, stage D uses them, so D2 keeps them"
+  ],
+  "everything_else": "identical to stage D: HistGradientBoostingRegressor with the same fixed settings, day-demeaned 1/99-clipped label, 400,000-row subsample, the same 5 folds and 5-session embargo, the same seed, daily top-3 by raw score among eligible rows, 35 bp",
+  "comparison_and_decision": [
+    "D and D2 are scored IDENTICALLY by compare_d_variants: each day's top-3 re-drawn without ETFs (by ISIN when an NSE bhavcopy is given, else the name rule), and exits that close locked at the lower band moved to the first sellable open (the forensics rule 2)",
+    "paired comparison: each test day, D2's corrected top-3 net minus D's; 98.75% block-bootstrap interval (block 10, 10,000 resamples)",
+    "D2 REPLACES D for a target only if (a) D2 passes the stage-D gate under corrected scoring AND (b) the paired difference's 98.75% lower bound is above zero. Otherwise D (all features) stays: it passed first, and a tie goes to the model that did not need selecting."
+  ],
+  "not_in_D2": ["no tuning", "no other selection rule", "no re-run to improve a result"],
+  "config": {
+    "selection": "nested_B_rule_family_leaders_plus_market_level",
+    "min_names": 15, "min_dates": 60, "hac_lag": 20,
+    "q_max": 0.10, "blocks": 5, "min_sign_blocks": 4,
+    "market_level_share": 0.95,
+    "family_corr": 0.80, "family_sample_dates": 60,
+    "switch_interval_level": 0.9875,
+    "seed": 7
+  }
+}
