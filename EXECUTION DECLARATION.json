@@ -1,0 +1,59 @@
+{
+  "family_id": "oc_v1",
+  "stage": "E",
+  "declared": "2026-09-30",
+  "status": "Declared BEFORE any execution simulation was run. stage_e_execution refuses to run if its settings differ from 'config', and only on engines frozen by freeze_engines.py (hashes verified).",
+  "what_this_is": "A trading simulation of the frozen engines' walk-forward watchlists with real money mechanics: capital, share rounding, Zerodha delivery charges, slippage and market impact, liquidity caps, overlapping holds, locked circuits at entry and exit, missing bars. It answers how to run the engines and what to expect.",
+  "what_this_is_not": "New evidence that the edge exists. It runs on the same history the engines were built and judged on. Only the forward paper ledger is untouched evidence. The PRIMARY configuration below is fixed in advance; every grid and scenario is DESCRIPTIVE - picking the best-looking row of a grid would be fitting the backtest, and the report says so next to every grid.",
+  "primary": {
+    "engine": "D (primary arm; the ensemble is the challenger)",
+    "watchlist": "each signal day T, the engine's walk-forward score for label_oc_5 over eligible stocks (next open buyable), ranked high to low, ties by symbol; ETFs removed (name rule + universe_exclude.txt, or ISIN when an NSE bhavcopy is given)",
+    "new_positions_per_day": 3,
+    "hold_sessions": 5,
+    "sizing": "equal weight: each new position gets (equity at T's close) / (3 x 5) = 1/15 of equity; up to 15 positions open; integer shares",
+    "entry": "buy at the open of the next session in the pre-open auction; a pick with no bar that session, or capped to zero by liquidity, is replaced by the next-ranked stock (up to 20 deep)",
+    "exit": "sell at the close of the 5th session held; if that close is locked at the lower band, sell at the first later open that is not itself locked (the forensics rule, tick-aware)",
+    "duplicates": "allowed: a stock picked again while held opens a separate tranche (this is what the walk-forward per-trade result assumes)",
+    "capital": 1000000,
+    "liquidity_cap": "each order at most 2% of the stock's median daily turnover (panel column X_turnover_med at T); the rest stays in cash",
+    "costs": "zerodha_base: see costs"
+  },
+  "costs": {
+    "statutory_source": "zerodha.com/charges, checked 2026-09-30; DP charge from a secondary calculator (stockcalc.in)",
+    "buy": "STT 0.1% + stamp 0.015% + NSE transaction 0.00322% + SEBI 0.0001% + GST 18% on (transaction + SEBI)",
+    "sell": "STT 0.1% + NSE transaction 0.00322% + SEBI 0.0001% + GST 18% on (transaction + SEBI) + DP Rs 15.93 per stock per sell day",
+    "slippage_zerodha_base": "entry (opening auction): market impact only; exit: one tick (NSE tick size for the date) + market impact. Impact = 0.5 x daily volatility (20 sessions) x sqrt(order value / median daily turnover)",
+    "slippage_zerodha_stress": "impact coefficient 1.0 and one tick on BOTH sides",
+    "flat35": "research convention: 35 bp per round trip, nothing else, fractional shares, no liquidity cap - reproduces the per-trade walk-forward numbers exactly (a consistency check)"
+  },
+  "descriptive_questions": [
+    "headline: CAGR, volatility, Sharpe, Sortino, max drawdown and its length, Calmar, exposure, trades",
+    "calendar: every year, every month, worst day / week / month, losing streaks, recent periods (2024+, 2025-03-05+)",
+    "trades: win rate, average win and loss, payoff, distribution, best and worst, how much the biggest 5% carry, locked exits and their cost",
+    "rank: are picks 1, 2 and 3 worth equal money - per-rank average net for ranks 1 to 10",
+    "costs: every rupee by type, and costs as a share of gross profit",
+    "capacity: the primary setup at Rs 2 lakh to Rs 5 crore - where impact and liquidity caps eat the edge",
+    "construction grid: positions per day {1,2,3,5,10} x hold {1,2,3,5,7,10} sessions",
+    "rules: stop-loss at 5 / 8 / 12% (checked on daily lows, gaps fill at the open, locked days cannot sell); no duplicate holdings",
+    "engines: D, the ensemble, and a 50/50 capital split between them",
+    "costs scenarios: flat35, zerodha_base, zerodha_stress",
+    "benchmarks: random picks with identical mechanics (10 seeds), and buying the whole universe equal-weight",
+    "regimes: universe trend (50-session return up/down) and volatility tercile",
+    "uncertainty: block-bootstrap ranges (block 10, 2,000 resamples) for CAGR and max drawdown"
+  ],
+  "limits": [
+    "the watchlists hold only stocks whose next open was buyable, so a pick that would have opened locked is already replaced by the next rank - which assumes you act in the pre-open (9:00-9:08) when locks are visible",
+    "a stock that does not trade on the entry session is replaced; the research labels instead used the stock's own next bar - rare",
+    "no survivorship correction; no trade-for-trade (BE) or surveillance restrictions; prices from the raw cache as the labels were",
+    "taxes are not modelled"
+  ],
+  "config": {
+    "engine": "D", "target": "label_oc_5", "n_per_day": 3, "hold": 5, "capital": 1000000,
+    "sizing": "equal_tranche", "integer_shares": true, "reserve_depth": 20, "duplicates": true,
+    "liquidity_cap_frac": 0.02, "costs": "zerodha_base", "stop_pct": null,
+    "impact_k": {"zerodha_base": 0.5, "zerodha_stress": 1.0},
+    "grid_n": [1, 2, 3, 5, 10], "grid_hold": [1, 2, 3, 5, 7, 10],
+    "capital_sweep": [200000, 500000, 1000000, 2500000, 5000000, 10000000, 25000000, 50000000],
+    "stops": [0.05, 0.08, 0.12], "random_seeds": 10, "boot_B": 2000, "boot_block": 10, "seed": 7
+  }
+}

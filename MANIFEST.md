@@ -1,4 +1,4 @@
-# bigmove_deploy — frozen bundle (29 Sept 2026; + tradability_audit v1; + stages A, B, C, D, D-forensics, D2, D_C and the variant comparison in `open_close\`)
+# bigmove_deploy — frozen bundle (30 Sept 2026; + tradability_audit v1; + stages A, B, C, D, D-forensics, D2, D_C and the variant comparison in `open_close\`)
 
 All files go FLAT into `C:\Users\karanvsi\PyCharmMiscProject\bigmove_deploy` (they import each other by name). `tests\` stays a subfolder.
 
@@ -99,6 +99,13 @@ Separate on purpose: the 23:45 daily pipeline keeps using the main folder's v31 
 | STAGE_DX_DECLARATION.json | oc_v1 DX | the C-only arm, the 50/50 D+C rank ensemble, the decision rule and the CLOSURE rule (if neither replaces D, the combination question is closed for oc_v1), declared before any fit |
 | stage_dx_ensemble.py | v1 | fits stage D's model on the 123 C features alone (STAGEDXC_*), then builds ENS = 0.5 rank(D) + 0.5 rank(C) from the existing D run and the C run (STAGEDXE_*); both in stage D's format ; reports the mean daily rank correlation of D and C scores |
 | tests\test_stage_dx.py | - | C arm = 123 C features with stage D settings; every ensemble top-3 re-derived by pandas; closure-rule re-run guard; weights fixed; comparison labels C/ENS and the pick-agreement diagnostic re-derived from scored picks |
+| freeze_engines.py | v1 | freezes D (primary) and the ensemble (challenger) on label_oc_5: SHA-256 of their runs, code, declarations and panel metadata in `panel_oc\frozen\FROZEN_ENGINES.json`; verify_frozen() makes later tools refuse any changed byte |
+| EXECUTION_DECLARATION.json | oc_v1 E | the primary trading setup (D, 3 a day, hold 5, 1/15 of equity, Rs 10 lakh, Zerodha costs + impact, 2% liquidity cap, honest exits) and every descriptive scenario, declared before any simulation |
+| stage_e_execution.py | v1 | execution backtest: day-by-day cash, integer shares, Zerodha delivery charges incl. DP, tick + square-root impact, liquidity caps, overlapping holds, locked circuits at entry and exit, stops; primary + ensemble + split + cost scenarios + capital sweep + 30-cell grid + random benchmarks; report answers performance, calendar, trades, rank, costs, capacity, rules, regimes, bootstrap ranges. Output `panel_oc\stage_e\EXEC_*` |
+| tests\test_stage_e.py | - | freeze hashes and tamper refusal; Zerodha costs by hand; exits and stops by hand; research convention reproduces every honest-exit trade exactly; books balance to the rupee; no look-ahead; liquidity cap; impact vs fixed DP costs; no-duplicates |
+| PATHS_DECLARATION.json | oc_v1 E-paths | the path study: picks, daily-bar rules (same-session ambiguity, gaps, frozen circuits), 24 % brackets, 12 ATR brackets, 3 trailing stops, target and stop levels - fixed before any path was computed |
+| stage_e_paths.py | v1 | inside every trade of frozen engine D: MFE/MAE (% and ATR) and their session, the average path split into overnight and in-session, time to target, stop touches and winners killed, target-first vs stop-first for every declared bracket (conservative and optimistic), trailing stops, giveback, by rank. Output `panel_oc\stage_e\PATHS_*` |
+| tests\test_stage_e_paths.py | - | every mechanic on hand-built paths; a never-triggering bracket = the plain exit on every trade; conservative <= optimistic; picks = the execution simulator's trades exactly |
 
 ## Optional user file
 - `%CACHE_DAILY_ROOT%\universe_exclude.txt` - one symbol per line: extra funds/non-equities for panel_build to exclude (the ETF rule catches the systematic names).

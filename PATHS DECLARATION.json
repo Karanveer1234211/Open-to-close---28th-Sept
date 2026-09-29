@@ -1,0 +1,29 @@
+{
+  "family_id": "oc_v1",
+  "stage": "E-paths",
+  "declared": "2026-09-30",
+  "status": "Declared BEFORE any trade path was computed. stage_e_paths refuses to run if its settings differ from 'config', and only on frozen engines.",
+  "question": "What happens INSIDE each trade of the frozen engine: how far it runs for and against you (MFE / MAE), when, whether a price target or stop is hit first, how many sessions it takes, and whether a bracket, stop or trailing stop would have beaten the plain 5-session exit.",
+  "trades": "the primary rule's picks: each signal day, engine D's top 3 (ETFs removed; a pick with no bar on the next session is replaced by the next rank), bought at the next session's open. The same picks for the ensemble are summarised in one line.",
+  "window": "10 sessions from the entry (the entry session counts as session 1) - to see beyond the 5-session hold",
+  "daily_bar_rules": [
+    "the entry session's high and low come after the entry, which is the opening price",
+    "a later session that OPENS beyond a level fills at that open (a gap through a stop is worse, a gap through a target is better)",
+    "if one session's range touches both the target and the stop, the order inside the day is unknown: CONSERVATIVE counts the stop first (the headline), OPTIMISTIC counts the target first (the bound); the number of such trades is reported",
+    "a stop cannot fill on a session frozen at the lower band (open = high = low = close, locked); it waits for the first session that is not",
+    "the plain time exit uses the forensics rule: a close locked at the lower band sells at the first later open that is not locked"
+  ],
+  "cost": "35 bp per round trip (the research convention), so every rule is compared on the same footing",
+  "what_this_is_not": "A search for the best exit. Every level below is fixed in advance, and all of them are shown. The grid has 36 brackets and 3 trailing stops: the best-looking one will look good partly by chance, so the report shows in how many of the years each rule beats the plain exit. Changing the trading rule would be a NEW engine variant, judged forward, never by this table. The frozen engines are unchanged.",
+  "config": {
+    "engine": "D", "target": "label_oc_5", "picks_per_day": 3, "hold": 5, "window": 10, "reserve_depth": 20,
+    "cost_bps": 35.0,
+    "pct_targets": [0.02, 0.03, 0.05, 0.08, 0.10, 0.15],
+    "pct_stops": [0.03, 0.05, 0.08, 0.10],
+    "atr_targets": [1.0, 1.5, 2.0, 3.0],
+    "atr_stops": [1.0, 1.5, 2.0],
+    "trailing": [0.05, 0.08, 0.12],
+    "hit_levels": [0.02, 0.03, 0.05, 0.08, 0.10, 0.15, 0.20],
+    "atr_window": 14
+  }
+}
