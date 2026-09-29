@@ -1,4 +1,4 @@
-# bigmove_deploy — frozen bundle (28 Sept 2026; + tradability_audit v1; + stages A, B and D in `open_close\`)
+# bigmove_deploy — frozen bundle (29 Sept 2026; + tradability_audit v1; + stages A, B, D, D-forensics, D2 and the variant comparison in `open_close\`)
 
 All files go FLAT into `C:\Users\karanvsi\PyCharmMiscProject\bigmove_deploy` (they import each other by name). `tests\` stays a subfolder.
 
@@ -82,6 +82,14 @@ Separate on purpose: the 23:45 daily pipeline keeps using the main folder's v31 
 | stage_d_gate.py | v1 | stage D: per target, HGB (fixed settings, no tuning) on all clean features, no selection; label = target minus the day's eligible mean, clipped at the fold's 1st/99th pct; walk-forward over every resolved session incl. 2025-03-05+ (embargo asserted); daily top-3 by raw score among eligible rows. PASS = 98.75% lower bound of top-3 net > 0 AND 2024+ mean net > 0 AND 98.75% lower bound of excess > 0. Refuses unless audited panel, unchanged manifest, stage B run, settings = declaration; logs the declaration hash before fitting. Output `panel_oc\stage_d\STAGED_*` |
 | STAGE_D_DECLARATION.json | oc_v1 D | the stage-D rules and every setting, declared before any fit; the tool refuses if they differ |
 | tests\test_stage_d.py | - | label, bootstrap (= research_common at 95%), top-n with ties/missing outcomes; a world with a different truth per target (noise FAIL; skill in a losing market FAIL on net; skill ending 2024 FAIL on recency; persistent PASS); pandas re-derivation of every daily top-3; eligibility / embargo / firewall sabotage |
+| stage_d_forensics.py | v1 | re-scores each stage-D target's daily top-3 with three corrections that can only block: ETFs out by ISIN (INF = fund unit, from an NSE bhavcopy), exits closing locked at the lower band moved to the first sellable open, one tick per round trip at NSE's tick size for the date; then the stage-D gate unchanged. Stops if picks no longer re-derive from the raw cache (<99.5%). Output `panel_oc\stage_d\<run>\forensics\FORENSICS_*` |
+| FORENSICS_DECLARATION.json | oc_v1 D-forensics | the forensic rules and settings, declared before the run |
+| tests\test_stage_d_forensics.py | - | tick schedule at every boundary; locked-exit re-scoring by hand; ISIN files in 3 layouts + zip; a world where each target dies at a different correction (penny ticks, ETFs, locked exits) and a clean one survives; integrity stop; preconditions |
+| stage_d2_nested.py | v1.1 | D2: stage D's exact model, but per fold stage B's rule is re-run on that fold's TRAINING rows only (BH q <= 0.10 pooled over the fold's cells + sign in >= 4 of 5 training blocks), one feature per family, plus all market-level columns. Output `panel_oc\stage_d\STAGED2_*` in stage D's format + selection.json |
+| STAGE_D2_DECLARATION.json | oc_v1 D2 | the nested selection and the switch rule, declared before D2 was fitted |
+| compare_d_variants.py | v1 | scores stage-D runs identically (ETFs re-drawn out, exits locked at the lower band moved to the first sellable open) and applies the declared switch rule: a variant replaces the baseline only if it passes the gate under corrected scoring AND its paired daily difference has a 98.75% lower bound above zero. Output `panel_oc\stage_d\compare\COMPARE_*` |
+| tests\test_stage_d2.py | - | nested screen vs scipy; stability, families, market-level; end to end: selection sees only training rows (instrumented), a test-window-only feature is never picked, model settings = stage D |
+| tests\test_compare_d.py | - | identical variant = exact tie; a better variant replaces on its target only; a locked-exit picker loses once exits are honest; cross-checked against the forensics tool |
 
 ## Optional user file
 - `%CACHE_DAILY_ROOT%\universe_exclude.txt` - one symbol per line: extra funds/non-equities for panel_build to exclude (the ETF rule catches the systematic names).
