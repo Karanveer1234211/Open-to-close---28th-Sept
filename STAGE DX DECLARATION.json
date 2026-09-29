@@ -1,0 +1,31 @@
+{
+  "family_id": "oc_v1",
+  "stage": "DX",
+  "declared": "2026-09-29",
+  "status": "Declared BEFORE the C-only model was fitted and before any ensemble score existed. stage_dx_ensemble refuses to run if its settings differ from 'config' and logs this file's hash in the research ledger before the first fit.",
+  "question": "Does the C feature family carry information D lacks, such that a C-only specialist, or a declared D+C score ensemble, picks a better daily top-3 than D?",
+  "why_now": "D and D_C share only 28-43% of daily top-3 picks. Their daily P&L correlates 0.66-0.78, but with the shared market move removed only 0.44 (oc_5), 0.58 (oc_3), 0.59 (oc_2), 0.75 (oc_1): the stock-picking parts disagree more than the raw P&L suggests. D_C is statistically indistinguishable from D. A capital split was measured (small risk reduction); a score ensemble was not, and C alone was never run.",
+  "arms": {
+    "D": "the baseline, stage D's existing run (205 clean features) - not refitted",
+    "DC": "the existing D_C run (205 + 123 features) - not refitted",
+    "C": "stage D's exact model (STAGE_D_DECLARATION.json, re-verified) on the 123 stage-C features ONLY",
+    "ENS": "score = 0.5 x per-date percentile rank of D's raw score + 0.5 x per-date percentile rank of C's raw score, over eligible rows scored by both; daily top-3 by that score, ties by symbol. No weights chosen, no tuning, no other combination."
+  },
+  "everything_else": "identical to stage D: folds, 5-session embargo, HistGradientBoostingRegressor settings, day-demeaned 1/99-clipped label, 400,000-row subsample, seed, eligible rows only, top-3, 35 bp",
+  "decision": "compare_d_variants with D as the baseline and identical corrected scoring (ETFs re-drawn out, exits locked at the lower band moved to the first sellable open). C or ENS replaces D for a target only if it passes the stage-D gate under that scoring AND its paired daily difference over D has a 98.75% lower bound above zero - the same rule as D2 and D_C.",
+  "closure": "If neither C nor ENS replaces D on any target, the model-combination question is CLOSED for family oc_v1: no other weights, no other pairs, no three-way blends, no re-run. 'Not shown better' is accepted as the answer even though it is not proof of 'no value' - the paired intervals so far are 36-86 bp wide, so a small real gain cannot be detected on this history, and more variants would only multiply the chances of a lucky pass.",
+  "diagnostic": "descriptive only, decides nothing: each day, picks both models choose, D-only picks and C-only picks, with their mean corrected net; daily P&L correlation with and without the market's move; the mean daily rank correlation of D's and C's scores",
+  "config": {
+    "c_only_model": "stage_d_model_on_C_features_only",
+    "ensemble": "mean_of_per_date_percentile_ranks",
+    "ensemble_weights": [
+      0.5,
+      0.5
+    ],
+    "ensemble_members": [
+      "D",
+      "C"
+    ],
+    "switch_interval_level": 0.9875
+  }
+}

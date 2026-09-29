@@ -38,7 +38,7 @@ import stage_d_gate as SD          # noqa: E402
 import stage_c_features as SC      # noqa: E402
 import stage_c_screen as SCS       # noqa: E402
 
-CODE_VERSION = "stage_dc_model v1"
+CODE_VERSION = "stage_dc_model v1.1"   # v1.1: run_dc(include_base=False) serves the C-only arm; D_C unchanged
 FAMILY_ID = SB.FAMILY_ID
 
 
@@ -68,12 +68,13 @@ def check_preconditions(pp: Path, reason: Optional[str]) -> dict:
     return {"c_sha": sha, "names": names, "screen_run": scr[-1].get("run_id"), "prior": prior}
 
 
-def run_dc(pp: Path, targets: List[str], c_names: List[str], verbose: bool = True, cfg: Optional[dict] = None) -> dict:
+def run_dc(pp: Path, targets: List[str], c_names: List[str], verbose: bool = True, cfg: Optional[dict] = None,
+           include_base: bool = True) -> dict:
     import feasibility_test as FT
     from sklearn.ensemble import HistGradientBoostingRegressor
     cfg = dict(cfg or SD.CFG)
     t0 = time.perf_counter()
-    base_feats, excluded = SB.clean_feature_list(pp)
+    base_feats, excluded = SB.clean_feature_list(pp) if include_base else ([], {})
     feats = base_feats + list(c_names)
     RC.assert_no_label_leak(feats, "stage_dc_model")
     if len(set(feats)) != len(feats):

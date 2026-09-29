@@ -48,8 +48,8 @@ import stage_d_gate as SD          # noqa: E402
 import stage_d_forensics as SF     # noqa: E402
 import stage_d2_nested as SD2      # noqa: E402
 
-CODE_VERSION = "compare_d_variants v1.1"   # v1.1: D_C runs (stage C) join the comparison
-RUN_KINDS = ("stage_d_gate", "stage_d2_run", "stage_dc_run")
+CODE_VERSION = "compare_d_variants v1.2"   # v1.2: C-only and ENS arms (stage DX); pick-agreement diagnostic
+RUN_KINDS = ("stage_d_gate", "stage_d2_run", "stage_dc_run", "stage_dx_c_run", "stage_dx_ens_run")
 
 
 class PreconditionError(SystemExit):
@@ -69,11 +69,32 @@ def resolve_runs(pp: Path, runs: Optional[List[str]]) -> List[str]:
             raise PreconditionError(f"not stage-D runs in this panel's ledger: {bad}")
         return runs
     base = [e["run_id"] for e in E if e.get("kind") == "stage_d_gate"]
-    var = [[e["run_id"] for e in E if e.get("kind") == k] for k in ("stage_d2_run", "stage_dc_run")]
+    var = [[e["run_id"] for e in E if e.get("kind") == k]
+           for k in ("stage_d2_run", "stage_dc_run", "stage_dx_c_run", "stage_dx_ens_run")]
     var = [v[-1] for v in var if v]
     if not base or not var:
         raise PreconditionError("need a stage-D run and a D2 or D_C run on record (or pass --runs)")
     return [base[-1]] + var
+
+
+def label_of(run_id: str) -> str:
+    for pre, lab in (("STAGEDXE", "ENS"), ("STAGEDXC", "C"), ("STAGEDC", "DC"), ("STAGED2", "D2")):
+        if run_id.startswith(pre):
+            return lab
+    return "D"
+
+
+def pick_agreement(pa: pd.DataFrame, pb: pd.DataFrame, tg: str) -> dict:
+    """Descriptive: corrected net of picks both runs chose, baseline-only picks and variant-only picks."""
+    a = pa[pa["target"] == tg][["timestamp", "symbol", "net_corr"]]
+    b = pb[pb["target"] == tg][["timestamp", "symbol", "net_corr"]]
+    m = a.merge(b, on=["timestamp", "symbol"], how="outer", suffixes=("_a", "_b"), indicator=True)
+    out = {}
+    for key, sel, col in (("both", "both", "net_corr_a"), ("baseline_only", "left_only", "net_corr_a"),
+                          ("variant_only", "right_only", "net_corr_b")):
+        v = m.loc[m["_merge"] == sel, col].astype(float)
+        out[key] = {"picks": int(len(v)), "mean_net_bp": float(v.mean() * 1e4) if v.notna().any() else float("nan")}
+    return out
 
 
 def score_run(pp: Path, root: Path, folder: Path, targets: List[str], etf: set, cfg: dict,
@@ -154,6 +175,9 @@ def compare(scored: Dict[str, dict], runs: List[str], targets: List[str], cfg: d
             a = scored[base]["targets"][tg]["daily"]["net_corr"]
             b = scored[r]["targets"][tg]["daily"]["net_corr"]
             j = pd.concat([a.rename("a"), b.rename("b")], axis=1).dropna().sort_index()
+            xa = scored[base]["targets"][tg]["daily"]["excess_corr"]
+            xb = scored[r]["targets"][tg]["daily"]["excess_corr"]
+            jx = pd.concat([xa.rename("a"), xb.rename("b")], axis=1).dropna()
             diff = SD.block_bootstrap((j["b"] - j["a"]).to_numpy(), level, cfg["boot_B"], cfg["boot_block"], cfg["seed"])
             pa = scored[base]["picks"]
             pb = scored[r]["picks"]
@@ -163,7 +187,10 @@ def compare(scored: Dict[str, dict], runs: List[str], targets: List[str], cfg: d
             vpass = out["runs"][r][tg]["pass"]
             replace = bool(vpass and np.isfinite(diff["lo"]) and diff["lo"] > 0)
             out["decisions"][r][tg] = {"paired_diff": diff, "variant_passes_gate": vpass,
-                                       "pick_overlap_with_baseline": overlap, "replaces_baseline": replace}
+                                       "pick_overlap_with_baseline": overlap, "replaces_baseline": replace,
+                                       "pick_agreement": pick_agreement(pa, pb, tg),
+                                       "daily_pnl_corr": float(j["a"].corr(j["b"])),
+                                       "daily_excess_corr": float(jx["a"].corr(jx["b"]))}
     return out
 
 
@@ -204,12 +231,27 @@ def write_report(C: dict, scored: dict, runs: List[str], targets: List[str], pat
             L.append(f"| {tg} | {_iv(d['paired_diff'])} | {'yes' if d['variant_passes_gate'] else 'no'} | "
                      f"{d['pick_overlap_with_baseline']:.0%} | **{'REPLACE' if d['replaces_baseline'] else 'KEEP BASELINE'}** |")
         L.append("")
-    L += ["## 3. Corrected net by year (bp)", ""]
+    L += ["## 3. Pick agreement (descriptive - decides nothing)", "",
+          "Each day's corrected top-3 of the baseline and of each variant: stocks both chose, baseline-only, "
+          "variant-only; mean corrected net per pick (bp). Daily P&L correlation with the baseline, and the same "
+          "with the market's move removed (excess) - the plain one is inflated by shared market exposure.", ""]
+    for r in runs[1:]:
+        L += [f"**{labels[r]} vs {labels[runs[0]]}**", "",
+              "| target | both (n, net) | baseline-only (n, net) | variant-only (n, net) | daily P&L corr | excess corr |",
+              "|---|---|---|---|---|---|"]
+        for tg in targets:
+            d = C["decisions"][r][tg]
+            ag = d["pick_agreement"]
+            cell = lambda k: f"{ag[k]['picks']:,}, {ag[k]['mean_net_bp']:+.1f}"
+            L.append(f"| {tg} | {cell('both')} | {cell('baseline_only')} | {cell('variant_only')} | {d['daily_pnl_corr']:.2f} | "
+                     f"{d['daily_excess_corr']:.2f} |")
+        L.append("")
+    L += ["## 4. Corrected net by year (bp)", ""]
     for tg in targets:
         for r in runs:
             by = C["runs"][r][tg]["by_year"]
             L.append(f"- **{tg} {labels[r]}**: " + "; ".join(f"{y} {_bp(v)}" for y, v in by.items()))
-    L += ["", "## 4. What this does not say", "",
+    L += ["", "## 5. What this does not say", "",
           "- Tick costs and trade-for-trade restrictions are not in this scoring (stage_d_forensics covers ticks).",
           "- Survivorship is unmeasured. Only the forward paper ledger is untouched evidence.", ""]
     path.write_text("\n".join(L), encoding="utf-8")
@@ -244,8 +286,7 @@ def main(argv=None) -> int:
         cls = pd.DataFrame({"symbol": syms, "etf": [RC.is_etf_symbol(s, extra) for s in syms]})
         etf_note = "by the name rule - no bhavcopy given, so ETFs with plain names stay in"
     etf = set(cls.loc[cls["etf"], "symbol"])
-    labels = {r: ("DC" if r.startswith("STAGEDC") else "D2" if r.startswith("STAGED2") else "D") + f" ({r})"
-              for r in runs}
+    labels = {r: label_of(r) + f" ({r})" for r in runs}
     t0 = time.perf_counter()
     scored = {}
     for r in runs:
