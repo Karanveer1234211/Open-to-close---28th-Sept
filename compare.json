@@ -1,10 +1,12 @@
 {
-  "run_id": "COMPARE_20260929_002",
-  "tool": "compare_d_variants v1.1",
+  "run_id": "COMPARE_20260929_003",
+  "tool": "compare_d_variants v1.2",
   "runs": [
     "STAGED_20260928_001",
     "STAGED2_20260929_002",
-    "STAGEDC_20260929_001"
+    "STAGEDC_20260929_001",
+    "STAGEDXC_20260929_001",
+    "STAGEDXE_20260929_001"
   ],
   "etf_rule": "by the name rule - no bhavcopy given, so ETFs with plain names stay in",
   "d2_declaration_sha": "1de7aa2028f1c21a",
@@ -424,6 +426,282 @@
           "pass": true,
           "locked_exits": 208
         }
+      },
+      "STAGEDXC_20260929_001": {
+        "label_oc_1": {
+          "net": {
+            "mean": -0.005954340350992088,
+            "lo": -0.011828377848810094,
+            "hi": -0.001378812490913381,
+            "n_days": 1655,
+            "level": 0.9875,
+            "block": 10,
+            "B": 10000
+          },
+          "excess": {
+            "mean": -0.0007249087877471039,
+            "lo": -0.006481924852763591,
+            "hi": 0.0036405536143945417,
+            "n_days": 1655,
+            "level": 0.9875,
+            "block": 10,
+            "B": 10000
+          },
+          "stage_d_scoring_mean": 0.004272738163328251,
+          "recent_mean": -0.006752572423253576,
+          "post_lockbox_mean": -0.004619868962172813,
+          "by_year": {
+            "2020": -0.006241640158357985,
+            "2021": 0.006764628268476171,
+            "2022": -0.006849761301577862,
+            "2023": -0.01541201765078052,
+            "2024": -0.006818103957819564,
+            "2025": -0.006297969629490317,
+            "2026": -0.007309346811415192
+          },
+          "pass": false,
+          "locked_exits": 859
+        },
+        "label_oc_2": {
+          "net": {
+            "mean": 0.0024915705847034586,
+            "lo": -0.00163282308853883,
+            "hi": 0.006229093162487976,
+            "n_days": 1655,
+            "level": 0.9875,
+            "block": 10,
+            "B": 10000
+          },
+          "excess": {
+            "mean": 0.00680063698599813,
+            "lo": 0.003158216194687377,
+            "hi": 0.010079346601086477,
+            "n_days": 1655,
+            "level": 0.9875,
+            "block": 10,
+            "B": 10000
+          },
+          "stage_d_scoring_mean": 0.005918789709820832,
+          "recent_mean": -0.0020735977570510234,
+          "post_lockbox_mean": -0.004342097202178295,
+          "by_year": {
+            "2020": 0.009704088776826578,
+            "2021": 0.009604605014775185,
+            "2022": 0.0021064399021730566,
+            "2023": 0.0011137499016428572,
+            "2024": 0.003030769224359708,
+            "2025": -0.003095030747887526,
+            "2026": -0.007916417088390002
+          },
+          "pass": false,
+          "locked_exits": 339
+        },
+        "label_oc_3": {
+          "net": {
+            "mean": 0.00516470460626841,
+            "lo": 6.356789783795227e-07,
+            "hi": 0.009716838953271531,
+            "n_days": 1655,
+            "level": 0.9875,
+            "block": 10,
+            "B": 10000
+          },
+          "excess": {
+            "mean": 0.008534287143827967,
+            "lo": 0.0044102373378738765,
+            "hi": 0.011973361573700901,
+            "n_days": 1655,
+            "level": 0.9875,
+            "block": 10,
+            "B": 10000
+          },
+          "stage_d_scoring_mean": 0.007501185075798812,
+          "recent_mean": 0.0020238675161505814,
+          "post_lockbox_mean": -4.2453372071034974e-05,
+          "by_year": {
+            "2020": 0.012041509831992939,
+            "2021": 0.010836663165926335,
+            "2022": 0.002822515470792099,
+            "2023": 0.0036506787849778775,
+            "2024": 0.007201042779054678,
+            "2025": 0.0002196308425788175,
+            "2026": -0.002802923913411205
+          },
+          "pass": true,
+          "locked_exits": 260
+        },
+        "label_oc_5": {
+          "net": {
+            "mean": 0.009564459526215239,
+            "lo": 0.0021922558091796124,
+            "hi": 0.016527934506892134,
+            "n_days": 1655,
+            "level": 0.9875,
+            "block": 10,
+            "B": 10000
+          },
+          "excess": {
+            "mean": 0.010979244678127859,
+            "lo": 0.0056918125202525685,
+            "hi": 0.016088380582158467,
+            "n_days": 1655,
+            "level": 0.9875,
+            "block": 10,
+            "B": 10000
+          },
+          "stage_d_scoring_mean": 0.011923645504437008,
+          "recent_mean": 0.005918156309714566,
+          "post_lockbox_mean": 0.0043948958875403635,
+          "by_year": {
+            "2020": 0.02042997430861694,
+            "2021": 0.011563731676652665,
+            "2022": 0.000986113785372619,
+            "2023": 0.015512983710565368,
+            "2024": 0.015407581137339706,
+            "2025": 0.002316431133361556,
+            "2026": -0.0025073449153817508
+          },
+          "pass": true,
+          "locked_exits": 240
+        }
+      },
+      "STAGEDXE_20260929_001": {
+        "label_oc_1": {
+          "net": {
+            "mean": -0.005031138360928117,
+            "lo": -0.010623350492488024,
+            "hi": -0.0007396016634724892,
+            "n_days": 1655,
+            "level": 0.9875,
+            "block": 10,
+            "B": 10000
+          },
+          "excess": {
+            "mean": 0.0001982932023168675,
+            "lo": -0.005348782372393215,
+            "hi": 0.004355186258514026,
+            "n_days": 1655,
+            "level": 0.9875,
+            "block": 10,
+            "B": 10000
+          },
+          "stage_d_scoring_mean": 0.004593812114726259,
+          "recent_mean": -0.00634099805183055,
+          "post_lockbox_mean": -0.0033634537994107617,
+          "by_year": {
+            "2020": -0.0026870090915889133,
+            "2021": 0.006594760053544719,
+            "2022": -0.006049543448177234,
+            "2023": -0.01444320253481347,
+            "2024": -0.007752071819264079,
+            "2025": -0.0061185460476725646,
+            "2026": -0.004640039321625891
+          },
+          "pass": false,
+          "locked_exits": 747
+        },
+        "label_oc_2": {
+          "net": {
+            "mean": 0.004433322679935922,
+            "lo": 0.0007387742525077288,
+            "hi": 0.007790994442321039,
+            "n_days": 1655,
+            "level": 0.9875,
+            "block": 10,
+            "B": 10000
+          },
+          "excess": {
+            "mean": 0.008742389081230597,
+            "lo": 0.005415005041509773,
+            "hi": 0.011577559388811857,
+            "n_days": 1655,
+            "level": 0.9875,
+            "block": 10,
+            "B": 10000
+          },
+          "stage_d_scoring_mean": 0.0067945965705771775,
+          "recent_mean": 0.0006695387353568883,
+          "post_lockbox_mean": -0.00015928587386588667,
+          "by_year": {
+            "2020": 0.010418299477171471,
+            "2021": 0.011599693385672419,
+            "2022": 0.005643870896137854,
+            "2023": 0.00040652394002784967,
+            "2024": 0.004107141285476023,
+            "2025": -0.003920019441644367,
+            "2026": 0.002318026960033026
+          },
+          "pass": true,
+          "locked_exits": 214
+        },
+        "label_oc_3": {
+          "net": {
+            "mean": 0.006048155441912982,
+            "lo": 0.0010557606194058241,
+            "hi": 0.010422414444808627,
+            "n_days": 1655,
+            "level": 0.9875,
+            "block": 10,
+            "B": 10000
+          },
+          "excess": {
+            "mean": 0.009417737979472538,
+            "lo": 0.005313567058497981,
+            "hi": 0.012981839101944902,
+            "n_days": 1655,
+            "level": 0.9875,
+            "block": 10,
+            "B": 10000
+          },
+          "stage_d_scoring_mean": 0.007671544344571717,
+          "recent_mean": 0.00493477223144173,
+          "post_lockbox_mean": 0.0018644611009083411,
+          "by_year": {
+            "2020": 0.009848072332536444,
+            "2021": 0.013534544077144174,
+            "2022": 0.0027940294887406326,
+            "2023": 0.0011002383754326285,
+            "2024": 0.011229589620616902,
+            "2025": 0.0006938180696747292,
+            "2026": 0.0019956231301507337
+          },
+          "pass": true,
+          "locked_exits": 171
+        },
+        "label_oc_5": {
+          "net": {
+            "mean": 0.011196676311791769,
+            "lo": 0.004666616672302122,
+            "hi": 0.017794417677630566,
+            "n_days": 1655,
+            "level": 0.9875,
+            "block": 10,
+            "B": 10000
+          },
+          "excess": {
+            "mean": 0.012611461463704388,
+            "lo": 0.008261611679310598,
+            "hi": 0.01712934453249985,
+            "n_days": 1655,
+            "level": 0.9875,
+            "block": 10,
+            "B": 10000
+          },
+          "stage_d_scoring_mean": 0.012490589208133743,
+          "recent_mean": 0.00719825590319657,
+          "post_lockbox_mean": 0.006572833532643891,
+          "by_year": {
+            "2020": 0.022191076392587782,
+            "2021": 0.013916417065642889,
+            "2022": 0.010206325502052449,
+            "2023": 0.009604803909208063,
+            "2024": 0.015587241408118345,
+            "2025": 0.001975306305867782,
+            "2026": 0.002667549345779028
+          },
+          "pass": true,
+          "locked_exits": 165
+        }
       }
     },
     "decisions": {
@@ -440,7 +718,23 @@
           },
           "variant_passes_gate": false,
           "pick_overlap_with_baseline": 0.5158106747230614,
-          "replaces_baseline": false
+          "replaces_baseline": false,
+          "pick_agreement": {
+            "both": {
+              "picks": 2561,
+              "mean_net_bp": -84.06530948866099
+            },
+            "baseline_only": {
+              "picks": 2404,
+              "mean_net_bp": -15.978454877859642
+            },
+            "variant_only": {
+              "picks": 2404,
+              "mean_net_bp": -23.155838252243317
+            }
+          },
+          "daily_pnl_corr": 0.8464073216172621,
+          "daily_excess_corr": 0.8234735329978682
         },
         "label_oc_2": {
           "paired_diff": {
@@ -454,7 +748,23 @@
           },
           "variant_passes_gate": false,
           "pick_overlap_with_baseline": 0.4064451158106747,
-          "replaces_baseline": false
+          "replaces_baseline": false,
+          "pick_agreement": {
+            "both": {
+              "picks": 2018,
+              "mean_net_bp": 31.249526828799265
+            },
+            "baseline_only": {
+              "picks": 2947,
+              "mean_net_bp": 32.78986042538902
+            },
+            "variant_only": {
+              "picks": 2947,
+              "mean_net_bp": 25.015754299005376
+            }
+          },
+          "daily_pnl_corr": 0.7297101633599209,
+          "daily_excess_corr": 0.6070432570729728
         },
         "label_oc_3": {
           "paired_diff": {
@@ -468,7 +778,23 @@
           },
           "variant_passes_gate": true,
           "pick_overlap_with_baseline": 0.3500503524672709,
-          "replaces_baseline": false
+          "replaces_baseline": false,
+          "pick_agreement": {
+            "both": {
+              "picks": 1738,
+              "mean_net_bp": 90.27916801639115
+            },
+            "baseline_only": {
+              "picks": 3227,
+              "mean_net_bp": 47.3162876866931
+            },
+            "variant_only": {
+              "picks": 3227,
+              "mean_net_bp": 49.83135068300849
+            }
+          },
+          "daily_pnl_corr": 0.7319001438310873,
+          "daily_excess_corr": 0.5865896771287644
         },
         "label_oc_5": {
           "paired_diff": {
@@ -482,7 +808,23 @@
           },
           "variant_passes_gate": true,
           "pick_overlap_with_baseline": 0.2868076535750252,
-          "replaces_baseline": false
+          "replaces_baseline": false,
+          "pick_agreement": {
+            "both": {
+              "picks": 1424,
+              "mean_net_bp": 92.76471709620103
+            },
+            "baseline_only": {
+              "picks": 3541,
+              "mean_net_bp": 113.1038753541634
+            },
+            "variant_only": {
+              "picks": 3541,
+              "mean_net_bp": 71.13678047147357
+            }
+          },
+          "daily_pnl_corr": 0.6518174174926472,
+          "daily_excess_corr": 0.4057903589381415
         }
       },
       "STAGEDC_20260929_001": {
@@ -498,7 +840,23 @@
           },
           "variant_passes_gate": false,
           "pick_overlap_with_baseline": 0.43021148036253776,
-          "replaces_baseline": false
+          "replaces_baseline": false,
+          "pick_agreement": {
+            "both": {
+              "picks": 2136,
+              "mean_net_bp": -86.19001210126524
+            },
+            "baseline_only": {
+              "picks": 2829,
+              "mean_net_bp": -24.602897588735562
+            },
+            "variant_only": {
+              "picks": 2829,
+              "mean_net_bp": -0.14060392929712745
+            }
+          },
+          "daily_pnl_corr": 0.7823272415627476,
+          "daily_excess_corr": 0.7501587614636049
         },
         "label_oc_2": {
           "paired_diff": {
@@ -512,7 +870,23 @@
           },
           "variant_passes_gate": true,
           "pick_overlap_with_baseline": 0.34803625377643505,
-          "replaces_baseline": false
+          "replaces_baseline": false,
+          "pick_agreement": {
+            "both": {
+              "picks": 1728,
+              "mean_net_bp": 57.55522440296592
+            },
+            "baseline_only": {
+              "picks": 3237,
+              "mean_net_bp": 18.609155404946943
+            },
+            "variant_only": {
+              "picks": 3237,
+              "mean_net_bp": 43.14381380212265
+            }
+          },
+          "daily_pnl_corr": 0.7110905015610726,
+          "daily_excess_corr": 0.5872852615473029
         },
         "label_oc_3": {
           "paired_diff": {
@@ -526,7 +900,23 @@
           },
           "variant_passes_gate": true,
           "pick_overlap_with_baseline": 0.3518630412890232,
-          "replaces_baseline": false
+          "replaces_baseline": false,
+          "pick_agreement": {
+            "both": {
+              "picks": 1747,
+              "mean_net_bp": 81.18934245881982
+            },
+            "baseline_only": {
+              "picks": 3218,
+              "mean_net_bp": 52.13084931693235
+            },
+            "variant_only": {
+              "picks": 3218,
+              "mean_net_bp": 50.69568931038036
+            }
+          },
+          "daily_pnl_corr": 0.7232792208648763,
+          "daily_excess_corr": 0.5787766145450883
         },
         "label_oc_5": {
           "paired_diff": {
@@ -540,10 +930,270 @@
           },
           "variant_passes_gate": true,
           "pick_overlap_with_baseline": 0.27613293051359517,
-          "replaces_baseline": false
+          "replaces_baseline": false,
+          "pick_agreement": {
+            "both": {
+              "picks": 1371,
+              "mean_net_bp": 114.10767360916566
+            },
+            "baseline_only": {
+              "picks": 3594,
+              "mean_net_bp": 104.65990965225787
+            },
+            "variant_only": {
+              "picks": 3594,
+              "mean_net_bp": 97.56479896302282
+            }
+          },
+          "daily_pnl_corr": 0.6556196192947522,
+          "daily_excess_corr": 0.439255698389474
+        }
+      },
+      "STAGEDXC_20260929_001": {
+        "label_oc_1": {
+          "paired_diff": {
+            "mean": -0.0008445022215492806,
+            "lo": -0.003332324453189452,
+            "hi": 0.0014524146276515416,
+            "n_days": 1655,
+            "level": 0.9875,
+            "block": 10,
+            "B": 10000
+          },
+          "variant_passes_gate": false,
+          "pick_overlap_with_baseline": 0.318429003021148,
+          "replaces_baseline": false,
+          "pick_agreement": {
+            "both": {
+              "picks": 1581,
+              "mean_net_bp": -145.8559766402747
+            },
+            "baseline_only": {
+              "picks": 3384,
+              "mean_net_bp": -6.827767156785193
+            },
+            "variant_only": {
+              "picks": 3384,
+              "mean_net_bp": -19.218291772601333
+            }
+          },
+          "daily_pnl_corr": 0.7138977159121612,
+          "daily_excess_corr": 0.6705408632255769
+        },
+        "label_oc_2": {
+          "paired_diff": {
+            "mean": -0.0007248093511301445,
+            "lo": -0.0036152044327158912,
+            "hi": 0.001960775493391829,
+            "n_days": 1655,
+            "level": 0.9875,
+            "block": 10,
+            "B": 10000
+          },
+          "variant_passes_gate": false,
+          "pick_overlap_with_baseline": 0.2310171198388721,
+          "replaces_baseline": false,
+          "pick_agreement": {
+            "both": {
+              "picks": 1147,
+              "mean_net_bp": 62.69472412673197
+            },
+            "baseline_only": {
+              "picks": 3818,
+              "mean_net_bp": 22.991727407222847
+            },
+            "variant_only": {
+              "picks": 3818,
+              "mean_net_bp": 13.566168401562381
+            }
+          },
+          "daily_pnl_corr": 0.6418054700227015,
+          "daily_excess_corr": 0.49674035985332904
+        },
+        "label_oc_3": {
+          "paired_diff": {
+            "mean": -0.0010708413026428998,
+            "lo": -0.0039967624029051095,
+            "hi": 0.0018291874945649451,
+            "n_days": 1655,
+            "level": 0.9875,
+            "block": 10,
+            "B": 10000
+          },
+          "variant_passes_gate": true,
+          "pick_overlap_with_baseline": 0.19979859013091641,
+          "replaces_baseline": false,
+          "pick_agreement": {
+            "both": {
+              "picks": 992,
+              "mean_net_bp": 107.4643279368796
+            },
+            "baseline_only": {
+              "picks": 3973,
+              "mean_net_bp": 51.092434196844195
+            },
+            "variant_only": {
+              "picks": 3973,
+              "mean_net_bp": 37.71028703444299
+            }
+          },
+          "daily_pnl_corr": 0.6438800569179033,
+          "daily_excess_corr": 0.4572780648307298
+        },
+        "label_oc_5": {
+          "paired_diff": {
+            "mean": -0.001178604844773578,
+            "lo": -0.006079018275660683,
+            "hi": 0.003695278116043426,
+            "n_days": 1655,
+            "level": 0.9875,
+            "block": 10,
+            "B": 10000
+          },
+          "variant_passes_gate": true,
+          "pick_overlap_with_baseline": 0.14642497482376637,
+          "replaces_baseline": false,
+          "pick_agreement": {
+            "both": {
+              "picks": 727,
+              "mean_net_bp": 127.4569080333705
+            },
+            "baseline_only": {
+              "picks": 4238,
+              "mean_net_bp": 103.80540565458304
+            },
+            "variant_only": {
+              "picks": 4238,
+              "mean_net_bp": 89.84157427324794
+            }
+          },
+          "daily_pnl_corr": 0.578727905503143,
+          "daily_excess_corr": 0.3309241416089661
+        }
+      },
+      "STAGEDXE_20260929_001": {
+        "label_oc_1": {
+          "paired_diff": {
+            "mean": 7.869976851468952e-05,
+            "lo": -0.0014095399919159097,
+            "hi": 0.0015808367051772531,
+            "n_days": 1655,
+            "level": 0.9875,
+            "block": 10,
+            "B": 10000
+          },
+          "variant_passes_gate": false,
+          "pick_overlap_with_baseline": 0.4936555891238671,
+          "replaces_baseline": false,
+          "pick_agreement": {
+            "both": {
+              "picks": 2451,
+              "mean_net_bp": -102.0899515993263
+            },
+            "baseline_only": {
+              "picks": 2514,
+              "mean_net_bp": -1.3846427036144187
+            },
+            "variant_only": {
+              "picks": 2514,
+              "mean_net_bp": 0.16963076764824894
+            }
+          },
+          "daily_pnl_corr": 0.8566393267055069,
+          "daily_excess_corr": 0.8353074252275123
+        },
+        "label_oc_2": {
+          "paired_diff": {
+            "mean": 0.0012169427441023192,
+            "lo": -0.0008173586393073869,
+            "hi": 0.003227534766311213,
+            "n_days": 1655,
+            "level": 0.9875,
+            "block": 10,
+            "B": 10000
+          },
+          "variant_passes_gate": true,
+          "pick_overlap_with_baseline": 0.44108761329305135,
+          "replaces_baseline": false,
+          "pick_agreement": {
+            "both": {
+              "picks": 2190,
+              "mean_net_bp": 52.442885182589
+            },
+            "baseline_only": {
+              "picks": 2775,
+              "mean_net_bp": 16.159764059195837
+            },
+            "variant_only": {
+              "picks": 2775,
+              "mean_net_bp": 37.93317207529679
+            }
+          },
+          "daily_pnl_corr": 0.7728209133564216,
+          "daily_excess_corr": 0.6727967842133514
+        },
+        "label_oc_3": {
+          "paired_diff": {
+            "mean": -0.00018739046699832806,
+            "lo": -0.002771999969669208,
+            "hi": 0.0023966458580292824,
+            "n_days": 1655,
+            "level": 0.9875,
+            "block": 10,
+            "B": 10000
+          },
+          "variant_passes_gate": true,
+          "pick_overlap_with_baseline": 0.40181268882175225,
+          "replaces_baseline": false,
+          "pick_agreement": {
+            "both": {
+              "picks": 1995,
+              "mean_net_bp": 84.93267253086866
+            },
+            "baseline_only": {
+              "picks": 2970,
+              "mean_net_bp": 47.18995713076211
+            },
+            "variant_only": {
+              "picks": 2970,
+              "mean_net_bp": 44.057318515790065
+            }
+          },
+          "daily_pnl_corr": 0.7477372599276505,
+          "daily_excess_corr": 0.6110165228538136
+        },
+        "label_oc_5": {
+          "paired_diff": {
+            "mean": 0.00045361194080295207,
+            "lo": -0.0032905223299590654,
+            "hi": 0.00419714380110872,
+            "n_days": 1655,
+            "level": 0.9875,
+            "block": 10,
+            "B": 10000
+          },
+          "variant_passes_gate": true,
+          "pick_overlap_with_baseline": 0.33977844914400807,
+          "replaces_baseline": false,
+          "pick_agreement": {
+            "both": {
+              "picks": 1687,
+              "mean_net_bp": 122.53557238349403
+            },
+            "baseline_only": {
+              "picks": 3278,
+              "mean_net_bp": 99.41018165632417
+            },
+            "variant_only": {
+              "picks": 3278,
+              "mean_net_bp": 106.23615839013654
+            }
+          },
+          "daily_pnl_corr": 0.7102110553157089,
+          "daily_excess_corr": 0.5247015757921457
         }
       }
     }
   },
-  "seconds": 134.9
+  "seconds": 199.9
 }
